@@ -1,0 +1,12 @@
+{
+  "name": "OS60-keyboard",
+  "version": "1.0.0",
+  "description": "open source 60% keyboard case",
+  "main": "index.js",
+  "author": "tommy chan",
+  "license": "MIT",
+  "scripts": {
+    "case": "node cli.js case",
+    "plate": "node cli.js plate"
+  }
+}

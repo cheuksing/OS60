@@ -1,0 +1,219 @@
+[
+  {
+    "backcolor": "#00fafa",
+    "name": "66planck",
+    "author": "Tommy",
+    "notes": "This layout is an ortho linear keyboard, which compatible to generic 60% cases, aka poker cases.\nIt is meant to be fit in all cases, including HHKB cases.\nKrepublic's HHKB ALU case can also used (although it doesn't strictly follow hhkb layout).",
+    "background": {
+      "name": "Steel brushed dark",
+      "style": "background-image: url('/bg/metal/iron_texture1745.jpg');"
+    }
+  },
+  [
+    {
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "a": 7,
+      "w": 1.5
+    },
+    "DEL/ LCTRL",
+    {
+      "c": "#999999",
+      "t": "#999999"
+    },
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    {
+      "h": 1.25
+    },
+    "-",
+    "6",
+    "7",
+    "8",
+    "9",
+    "0",
+    "`",
+    {
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "w": 1.5
+    },
+    "HOME"
+  ],
+  [
+    {
+      "w": 1.5
+    },
+    "TAB",
+    {
+      "c": "#999999",
+      "t": "#999999"
+    },
+    "Q",
+    "W",
+    "E",
+    "R",
+    "T",
+    {
+      "x": 1
+    },
+    "Y",
+    "U",
+    "I",
+    "O",
+    "P",
+    "\\",
+    {
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "w": 1.5
+    },
+    "END"
+  ],
+  [
+    {
+      "y": -0.75,
+      "x": 6.5,
+      "c": "#999999",
+      "t": "#999999",
+      "h": 1.25
+    },
+    "="
+  ],
+  [
+    {
+      "y": -0.25,
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "w": 1.5
+    },
+    "BS",
+    {
+      "c": "#999999",
+      "t": "#999999"
+    },
+    "A",
+    "S",
+    "D",
+    "F",
+    "G",
+    {
+      "x": 1
+    },
+    "H",
+    "J",
+    "K",
+    "L",
+    ";",
+    "'",
+    {
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "w": 1.5
+    },
+    "ENTER"
+  ],
+  [
+    {
+      "y": -0.5,
+      "x": 6.5,
+      "c": "#999999",
+      "t": "#999999",
+      "h": 1.25
+    },
+    "["
+  ],
+  [
+    {
+      "y": -0.5,
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "w": 1.5
+    },
+    "ESC / LSHIFT",
+    {
+      "c": "#999999",
+      "t": "#999999"
+    },
+    "Z",
+    "X",
+    "C",
+    "V",
+    "B",
+    {
+      "x": 1
+    },
+    "N",
+    "M",
+    ",",
+    ".",
+    "/",
+    {
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "w": 1.5
+    },
+    "RSHIFT",
+    "FN"
+  ],
+  [
+    {
+      "y": -0.25,
+      "x": 6.5,
+      "c": "#999999",
+      "t": "#999999",
+      "h": 1.25
+    },
+    "]"
+  ],
+  [
+    {
+      "y": -0.75,
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "w": 1.5
+    },
+    "FN",
+    {
+      "w": 1.25
+    },
+    "LCTRL",
+    {
+      "w": 1.5
+    },
+    "WIN",
+    {
+      "c": "#999999",
+      "t": "#999999",
+      "w": 2.25
+    },
+    "SPACE",
+    {
+      "x": 1,
+      "w": 1.25
+    },
+    "ENTER",
+    {
+      "w": 1.25
+    },
+    "DOWN",
+    {
+      "c": "#C3EBEA",
+      "t": "#C3EBEA",
+      "w": 1.25
+    },
+    "UP",
+    {
+      "w": 1.25
+    },
+    "ALT",
+    "MENU",
+    {
+      "w": 1.5
+    },
+    "RCTRL"
+  ]
+]
