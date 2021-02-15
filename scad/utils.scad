@@ -219,7 +219,8 @@ module reinforce(layout = default_layout, thickness=10, padding = 10) {
 		translate([0, 0, -1]) {
 			linear_extrude(thickness + 2) {
 				union () {
-					button_cutoff();
+					// cleaner cut
+					button_cutoff(key_size, 12);
 					screws_cutoff();
 					// 15.6, see mx spec
 					// moded to 16.8 for cleaner stab cutoff
