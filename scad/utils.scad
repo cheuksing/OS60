@@ -89,10 +89,10 @@ function getCenterX(list, c = 0, stop) =
   ? list[c][0] + list[c][2] + getCenterX(list, c + 1, stop) 
   : list[c][0] / 2 + list[c][2];
 
-function getCenterY(list, c = 0, stop) = 
+function getCenterY(list, c = 0, stop, k) = 
  c < len(list) - 1 && c < stop
-  ? list[c][0][1] + list[c][0][3] + getCenterY(list, c + 1, stop) 
-  : list[c][0][1] / 2 + list[c][0][3];
+  ? 1 + list[c][0][3] + getCenterY(list, c + 1, stop, k) 
+  : list[c][k][1] / 2 + list[c][0][3];
 
 stabs = [
 	// 2u measured
@@ -144,7 +144,7 @@ module cut_key (layout = default_layout, size = 14) {
 			x_off = key[2];
 			y_off = key[3];
 			centerX = (getCenterX(row, 0, k)) * key_size;
-			centerY = (getCenterY(layout, 0, r)) * key_size;
+			centerY = (getCenterY(layout, 0, r, k)) * key_size;
 			translate([centerX, centerY, 0])
 				square(size, true);
 
@@ -237,10 +237,10 @@ module case(layout = default_layout, angle = 6, top = 6, bottom = 0, usb = 6, re
 		translate([0, 0, - usb - rein - top])
 			top_frame(top);
 		translate([0, 0, - usb - rein])
-			reinforce(default_layout, rein);
+			reinforce(layout, rein);
 		translate([0, 0, - usb])
 			usb_frame(usb);
 
-		base(default_layout, angle, bottom);
+		base(layout, angle, bottom);
 	}
 }

@@ -3,7 +3,7 @@
     "backcolor": "#00fafa",
     "name": "66planck",
     "author": "Tommy",
-    "notes": "This layout is an ortho linear keyboard, which compatible to generic 60% cases, aka poker cases.\nIt is meant to be fit in all cases, including HHKB cases.\nKrepublic's HHKB ALU case can also used (although it doesn't strictly follow hhkb layout).",
+    "notes": "Dummy testing json",
     "background": {
       "name": "Steel brushed dark",
       "style": "background-image: url('/bg/metal/iron_texture1745.jpg');"
