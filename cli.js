@@ -29,21 +29,25 @@ const {
   bottom = 0
 } = require('minimist')(process.argv.slice(2));
 
-console.log('Using ' + filePath);
-console.log('Generating ' + cliType)
+if (filePath) {
+  console.log('Using ' + filePath)
+  console.log('Generating ' + cliType)
 
-const fileName = path.basename(filePath, '.json');
-const kle = fs.readFileSync(filePath, 'utf-8');
-const layout = JSON.stringify(filterDesc(JSON.parse(kle)).map(filterRow));
+  const fileName = path.basename(filePath, '.json');
+  const kle = fs.readFileSync(filePath, 'utf-8');
+  const layout = JSON.stringify(filterDesc(JSON.parse(kle)).map(filterRow));
 
-let result = ''
+  let result = ''
 
-result += 'use <../utils.scad>;' + '\n'
-result += `layout = ${layout};` + '\n'
-if (cliType === 'case') result += `case(layout,${angle},${padding},${top},${reinforce},${middle},${bottom});` + '\n'
-if (cliType === 'plate') result += 'plate(layout);' + '\n'
+  result += 'use <../utils.scad>;' + '\n'
+  result += `layout = ${layout};` + '\n'
+  if (cliType === 'case') result += `case(layout,${angle},${padding},${top},${reinforce},${middle},${bottom});` + '\n'
+  if (cliType === 'plate') result += 'plate(layout);' + '\n'
 
-fs.writeFile(`scad/result/${fileName}_${cliType}.scad`, result, function (err) {
-  if (err) return console.log(err);
-  console.log('Done');
-});
+  fs.writeFile(`scad/result/${fileName}_${cliType}.scad`, result, function (err) {
+    if (err) return console.log(`Error: Can not reslove ${filePath}.`);
+    console.log(`Done: Please check ./scad/result/${fileName}_${cliType}.scad`)
+  });
+} else {
+  console.log('Missing required arguments: keyboard_layout_editor.json')
+}
