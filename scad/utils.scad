@@ -241,23 +241,23 @@ module reinforce(layout = default_layout, thickness=10, padding = 10) {
 module case(layout = default_layout, angle = 6, padding = 10, top = 6, rein = 3.5, mid = 6, bottom = 0) {
 	render () {
 		translate([0, 0, - mid - rein - top])
-			top_frame(top);
+			top_frame(top, padding);
 		translate([0, 0, - mid - rein])
-			reinforce(layout, rein);
+			reinforce(layout, rein, padding);
 		translate([0, 0, - mid])
-			usb_frame(mid);
+			usb_frame(mid, padding);
 
 			if (angle < 0) {
 				difference() {
 				translate([gh60_dim[0], gh60_dim[1], 0])
 				scale([-1, -1, 1])
-				base(layout, abs(angle), bottom);
+				base(layout, abs(angle), bottom, padding);
 
 				linear_extrude(bottom + big_value)
 				usb_cutoff(padding);
 				}
 			} else {
-				base(layout, angle, bottom);
+				base(layout, angle, bottom, padding);
 			}
 	}
 }
