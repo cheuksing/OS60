@@ -37,11 +37,14 @@ if (filePath) {
   const kle = fs.readFileSync(filePath, 'utf-8');
   const layout = JSON.stringify(filterDesc(JSON.parse(kle)).map(filterRow));
 
-  let result = ''
+  if (padding < 5) {
+    console.log('Warning: The minimum padding is 5, reset to 5!')
+  }
 
+  let result = ''
   result += 'use <../utils.scad>;' + '\n'
   result += `layout = ${layout};` + '\n'
-  if (cliType === 'case') result += `case(layout,${angle},${padding},${top},${reinforce},${middle},${bottom});` + '\n'
+  if (cliType === 'case') result += `case(layout,${angle},${Math.max(padding, 5)},${top},${reinforce},${middle},${bottom});` + '\n'
   if (cliType === 'plate') result += 'plate(layout);' + '\n'
 
   fs.writeFile(`scad/result/${fileName}_${cliType}.scad`, result, function (err) {
