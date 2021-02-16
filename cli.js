@@ -18,11 +18,16 @@ const fs = require('fs');
 const path = require('path');
 
 // Non-blocking example with fs.readFile
-const args = process.argv.splice(2);
-
-// Blocking example with fs.readFileSync
-const cliType = args[0];
-const filePath = args[1];
+// const args = process.argv.splice(2);]
+const {
+  _: [cliType, filePath],
+  angle = 6,
+  padding = 10,
+  top = 6,
+  reinforce = 3.5,
+  middle = 6,
+  bottom = 0
+} = require('minimist')(process.argv.slice(2));
 
 console.log('Using ' + filePath);
 console.log('Generating ' + cliType)
@@ -35,7 +40,7 @@ let result = ''
 
 result += 'use <../utils.scad>;' + '\n'
 result += `layout = ${layout};` + '\n'
-if (cliType === 'case') result += 'case(layout);' + '\n'
+if (cliType === 'case') result += `case(layout,${angle},${padding},${top},${reinforce},${middle},${bottom});` + '\n'
 if (cliType === 'plate') result += 'plate(layout);' + '\n'
 
 fs.writeFile(`scad/result/${fileName}_${cliType}.scad`, result, function (err) {

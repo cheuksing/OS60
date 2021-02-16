@@ -8,5 +8,8 @@
   "scripts": {
     "case": "node cli.js case",
     "plate": "node cli.js plate"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5"
   }
 }

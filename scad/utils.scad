@@ -1,5 +1,8 @@
 include <Round-Anything/polyround.scad>;
 
+// I don't want to do calculations
+big_value = 100;
+
 key_size = 19.05;
 
 gh60_dim = [285, 94.6];
@@ -212,36 +215,49 @@ module top_frame (thickness=10, padding = 10) {
 }
 
 module reinforce(layout = default_layout, thickness=10, padding = 10) {
-	difference() {
-		linear_extrude(thickness)
-		// extrudeWithRadius(thickness, 0.2, 0.2, 5)
-			border(padding, 0);
-		translate([0, 0, -1]) {
-			linear_extrude(thickness + 2) {
-				union () {
-					// cleaner cut
-					button_cutoff(key_size, 12);
-					screws_cutoff();
-					// 15.6, see mx spec
-					// moded to 16.8 for cleaner stab cutoff
-					cut_key(layout, 16.8);
-					// usb_cutoff(padding);
+	union () {
+		difference() {
+			linear_extrude(thickness)
+			// extrudeWithRadius(thickness, 0.2, 0.2, 5)
+				border(padding, 0);
+			translate([0, 0, -1]) {
+				linear_extrude(thickness + 2) {
+					union () {
+						// cleaner cut
+						button_cutoff(key_size, 12);
+						screws_cutoff();
+						// 15.6, see mx spec
+						// moded to 16.8 for cleaner stab cutoff
+						cut_key(layout, 16.8);
+						// usb_cutoff(padding);
+					}
 				}
 			}
 		}
+		top_frame(thickness, padding);
 	}
 }
 
-module case(layout = default_layout, angle = 6, top = 6, bottom = 0, usb = 6, rein = 3.5) {
+module case(layout = default_layout, angle = 6, padding = 10, top = 6, rein = 3.5, mid = 6, bottom = 0) {
 	render () {
-		layers = [5, 3.5, 6];
-		translate([0, 0, - usb - rein - top])
+		translate([0, 0, - mid - rein - top])
 			top_frame(top);
-		translate([0, 0, - usb - rein])
+		translate([0, 0, - mid - rein])
 			reinforce(layout, rein);
-		translate([0, 0, - usb])
-			usb_frame(usb);
+		translate([0, 0, - mid])
+			usb_frame(mid);
 
-		base(layout, angle, bottom);
+			if (angle < 0) {
+				difference() {
+				translate([gh60_dim[0], gh60_dim[1], 0])
+				scale([-1, -1, 1])
+				base(layout, abs(angle), bottom);
+
+				linear_extrude(bottom + big_value)
+				usb_cutoff(padding);
+				}
+			} else {
+				base(layout, angle, bottom);
+			}
 	}
 }
