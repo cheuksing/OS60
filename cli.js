@@ -22,11 +22,12 @@ const path = require('path');
 const {
   _: [cliType, filePath],
   angle = 6,
-  padding = 10,
-  top = 6,
+  padding = 4,
+  top = 8,
   reinforce = 3.5,
   middle = 6,
-  bottom = 0
+  bottom = 0,
+  reinforceScrew = 1
 } = require('minimist')(process.argv.slice(2));
 
 if (filePath) {
@@ -37,14 +38,14 @@ if (filePath) {
   const kle = fs.readFileSync(filePath, 'utf-8');
   const layout = JSON.stringify(filterDesc(JSON.parse(kle)).map(filterRow));
 
-  if (padding < 5) {
-    console.log('Warning: The minimum padding is 5, reset to 5!')
+  if (padding < 4) {
+    console.log('Warning: The minimum padding is 4, reset to 4!')
   }
 
   let result = ''
   result += 'use <../utils.scad>;' + '\n'
   result += `layout = ${layout};` + '\n'
-  if (cliType === 'case') result += `case(layout,${angle},${Math.max(padding, 5)},${top},${reinforce},${middle},${bottom});` + '\n'
+  if (cliType === 'case') result += `case(layout,${angle},${Math.max(padding, 4)},${top},${reinforce},${middle},${bottom}, ${reinforceScrew});` + '\n'
   if (cliType === 'plate') result += 'plate(layout);' + '\n'
 
   fs.writeFile(`scad/result/${fileName}_${cliType}.scad`, result, function (err) {

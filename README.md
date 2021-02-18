@@ -20,9 +20,11 @@ cli
   yarn plate <your_layout_from_keyboard_layout_editor.json>;
 
   <!-- case can take some parameters to customize -->
-  <!-- The minimum input of padding is 5. -->
-  <!-- When padding is set to 5, the real padding is 3. -->
-  yarn case test-case/gh60.json --top 2 --middle 10 --bottom 2 --padding 20 --angle 10 --reinforce 10
+  <!-- The minimum input of padding is 4. -->
+  <!-- When padding is set to 4mm, -->
+  <!-- the real padding is 4 - 0.3 * 2 = 3.6mm -->
+  <!-- screw hole sizes are radius -->
+  yarn case test-case/gh60.json --top 2 --middle 10 --bottom 2 --padding 20 --angle 10 --reinforce 10 --reinforceScrew 1
 ```
 
 results are placed in scad/result

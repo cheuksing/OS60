@@ -2,6 +2,7 @@ include <Round-Anything/polyround.scad>;
 
 // I don't want to do calculations
 big_value = 100;
+border_buffer = 0.3;
 
 key_size = 19.05;
 
@@ -193,7 +194,7 @@ module base (layout = default_layout, angle = 10, height=5, padding = 10) {
 		]);
 
 		linear_extrude(gh60_dim[0] + padding * 2)
-		border(2);
+		border(border_buffer);
 	}
 }
 
@@ -201,7 +202,7 @@ module usb_frame (thickness=10, padding = 10) {
 	linear_extrude(thickness)
 	difference() {
 		border(padding);
-		border(2);
+		border(border_buffer);
 		usb_cutoff(padding);
 	}
 }
@@ -210,11 +211,11 @@ module top_frame (thickness=10, padding = 10) {
 	linear_extrude(thickness)
 	difference() {
 		border(padding);
-		border(2);
+		border(border_buffer);
 	}
 }
 
-module reinforce(layout = default_layout, thickness=10, padding = 10) {
+module reinforce(layout = default_layout, thickness=10, padding = 10, screw = 1) {
 	union () {
 		difference() {
 			linear_extrude(thickness)
@@ -225,7 +226,7 @@ module reinforce(layout = default_layout, thickness=10, padding = 10) {
 					union () {
 						// cleaner cut
 						button_cutoff(key_size, 12);
-						screws_cutoff();
+						screws_cutoff(screw);
 						// 15.6, see mx spec
 						// moded to 16.8 for cleaner stab cutoff
 						cut_key(layout, 16.8);
@@ -238,12 +239,12 @@ module reinforce(layout = default_layout, thickness=10, padding = 10) {
 	}
 }
 
-module case(layout = default_layout, angle = 6, padding = 10, top = 6, rein = 3.5, mid = 6, bottom = 0) {
+module case(layout = default_layout, angle = 6, padding = 10, top = 8, rein = 3.5, mid = 6, bottom = 0, reinforce_screw = 1) {
 	render () {
 		translate([0, 0, - mid - rein - top])
 			top_frame(top, padding);
 		translate([0, 0, - mid - rein])
-			reinforce(layout, rein, padding);
+			reinforce(layout, rein, padding, reinforce_screw);
 		translate([0, 0, - mid])
 			usb_frame(mid, padding);
 
