@@ -45,7 +45,7 @@ if (filePath) {
   let result = ''
   result += 'use <../utils.scad>;' + '\n'
   result += `layout = ${layout};` + '\n'
-  if (cliType === 'case') result += `case(layout,${angle},${Math.max(padding, 4)},${top},${reinforce},${middle},${bottom}, ${reinforceScrew});` + '\n'
+  if (cliType === 'case') result += `case(layout,${angle},${Math.max(padding, 4)},${top},${reinforce},${middle},${bottom},${reinforceScrew});` + '\n'
   if (cliType === 'plate') result += 'plate(layout);' + '\n'
 
   fs.writeFile(`scad/result/${fileName}_${cliType}.scad`, result, function (err) {

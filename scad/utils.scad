@@ -109,36 +109,36 @@ stabs = [
 	57.15
 ];
 
-function _stabWidth(x, y, i) = [
-	x - stabs[i] - 3.5,
-	x + stabs[i] + 3.5,
+function _stabWidth(x, y, i, width = 7) = [
+	x - stabs[i] - width / 2,
+	x + stabs[i] + width / 2,
 	y - 8,
 	y + 8
 ];
 
-function _stabPath(left, right, top, bottom) = [
+function _stabPath(left, right, top, bottom, width = 7) = [
 	[
 		[left, top],
-		[left + 7, top],
-		[left + 7, bottom],
+		[left + width, top],
+		[left + width, bottom],
 		[left, bottom]
 	],
 	[
 		[right, top],
-		[right - 7, top],
-		[right - 7, bottom],
+		[right - width, top],
+		[right - width, bottom],
 		[right, bottom]
 	]
 ];
 
-module  cut_stabs  (x, y, i) {
-	s = _stabWidth(x, y, i);
-	p = _stabPath(s[0], s[1], s[2], s[3]);
+module  cut_stabs  (x, y, i, width = 7) {
+	s = _stabWidth(x, y, i, width);
+	p = _stabPath(s[0], s[1], s[2], s[3], width);
 	polygon(p[0]);
 	polygon(p[1]);
 }
 
-module cut_key (layout = default_layout, size = 14) {
+module cut_key (layout = default_layout, size = 14, simpleStab = false) {
 	for (r = [ 0 : len(layout) - 1 ] ) {
 		row = layout[r];
 		for (k = [ 0 : len(row) - 1 ] ) {
@@ -160,7 +160,7 @@ module cut_key (layout = default_layout, size = 14) {
 			} else if (w >= 3) {
 				cut_stabs(centerX, centerY, 1);
 			} else if (w >= 2) {
-				cut_stabs(centerX, centerY, 0);
+				cut_stabs(centerX, centerY, 0, simpleStab ? 10 : 7);
 			}
 		}
 	}
@@ -229,7 +229,7 @@ module reinforce(layout = default_layout, thickness=10, padding = 10, screw = 1)
 						screws_cutoff(screw);
 						// 15.6, see mx spec
 						// moded to 16.8 for cleaner stab cutoff
-						cut_key(layout, 16.8);
+						cut_key(layout, 16.8, true);
 						// usb_cutoff(padding);
 					}
 				}
@@ -239,26 +239,28 @@ module reinforce(layout = default_layout, thickness=10, padding = 10, screw = 1)
 	}
 }
 
-module case(layout = default_layout, angle = 6, padding = 10, top = 8, rein = 3.5, mid = 6, bottom = 0, reinforce_screw = 1) {
+module case(layout = default_layout, angle = 6, padding = 10, top = 8, rein = 3.5, mid = 6, bottom = 0, reinforce_screw = 1, seperator = 0) {
 	render () {
-		translate([0, 0, - mid - rein - top])
-			top_frame(top, padding);
-		translate([0, 0, - mid - rein])
-			reinforce(layout, rein, padding, reinforce_screw);
-		translate([0, 0, - mid])
-			usb_frame(mid, padding);
+		union () {
+			translate([0, 0, - mid - rein - top - 3 * seperator])
+				top_frame(top, padding);
+			translate([0, 0, - mid - rein - 2 * seperator])
+				reinforce(layout, rein, padding, reinforce_screw);
+			translate([0, 0, - mid - seperator])
+				usb_frame(mid, padding);
 
-			if (angle < 0) {
-				difference() {
-				translate([gh60_dim[0], gh60_dim[1], 0])
-				scale([-1, -1, 1])
-				base(layout, abs(angle), bottom, padding);
+				if (angle < 0) {
+					difference() {
+					translate([gh60_dim[0], gh60_dim[1], 0])
+					scale([-1, -1, 1])
+					base(layout, abs(angle), bottom, padding);
 
-				linear_extrude(bottom + big_value)
-				usb_cutoff(padding);
+					linear_extrude(bottom + big_value)
+					usb_cutoff(padding);
+					}
+				} else {
+					base(layout, angle, bottom, padding);
 				}
-			} else {
-				base(layout, angle, bottom, padding);
-			}
+		}
 	}
 }
