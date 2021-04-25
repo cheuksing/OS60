@@ -1,5 +1,7 @@
 include <Round-Anything/polyround.scad>;
+include <./screw_holes.scad>;
 
+$fn=32;
 // I don't want to do calculations
 big_value = 100;
 border_buffer = 0.3;
@@ -12,6 +14,23 @@ gh60_holes_radius = 2.5;
 
 default_layout = [[[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[2,1,0,0]],[[1.5,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1.5,1,0,0]],[[1.75,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[2.25,1,0,0]],[[2.25,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[2.75,1,0,0]],[[1.25,1,0,0],[1.25,1,0,0],[1.25,1,0,0],[6.25,1,0,0],[1.25,1,0,0],[1.25,1,0,0],[1.25,1,0,0],[1.25,1,0,0]]];
 
+function holes_offset(padding) = (padding - border_buffer) / 2;
+
+function holes_array(padding) = [
+	// left-top
+	[0 - holes_offset(padding), 0 - holes_offset(padding)],
+	// middle-top
+	[gh60_dim[0] + holes_offset(padding), 0 - holes_offset(padding)],
+	// right-top
+	[(gh60_dim[0] + 2 * holes_offset(padding)) / 2, 0 - holes_offset(padding)],
+	// left-bottom
+	[0 - holes_offset(padding), gh60_dim[1] + holes_offset(padding)],
+	// middle-bottom
+	[gh60_dim[0] + holes_offset(padding), gh60_dim[1] + holes_offset(padding)],
+	// right-bottom
+	[(gh60_dim[0] + 2 * holes_offset(padding)) / 2, gh60_dim[1] + holes_offset(padding)],
+];
+
 module screws_cutoff (holes_radius = gh60_holes_radius) {
 	holes = [
 		[25.2, 27.9],
@@ -20,25 +39,23 @@ module screws_cutoff (holes_radius = gh60_holes_radius) {
 		[190.5, 85.2]
 	];
 
-	union () {
-		for (i = holes) {
-			translate([i[0],i[1], 0])
-				circle(holes_radius, $fn = 50);
-		}
+	for (i = holes) {
+		translate([i[0],i[1], 0])
+			circle(holes_radius);
+	}
 
-		translate([1.5, 56.5])
-		hull() {
-			translate([-3.5, 0, 0])
-				circle(holes_radius, $fn = 50);
-				circle(holes_radius, $fn = 50);
-		}
+	translate([1.5, 56.5])
+	hull() {
+		translate([-3.5, 0, 0])
+			circle(holes_radius);
+			circle(holes_radius);
+	}
 
-		translate([gh60_dim[0] - 1.5, 56.5])
-		hull() {
-			translate([3.5, 0, 0])
-				circle(holes_radius, $fn = 50);
-				circle(holes_radius, $fn = 50);
-		}
+	translate([gh60_dim[0] - 1.5, 56.5])
+	hull() {
+		translate([3.5, 0, 0])
+			circle(holes_radius);
+			circle(holes_radius);
 	}
 };
 
@@ -52,32 +69,56 @@ module button_cutoff (width = 11, height = 12) {
 	]);
 }
 
-module usb_cutoff (frame_width) {
-	// a 12 x 15 is cutted
+module usb_cutoff (padding) {
+	// a 12 x padding is cutted
 	width = 12;
-	height = 15;
+	// height = 15;
 	mid = 25.2 - 7;
 	right = mid + (width / 2);
 	left = mid - (width / 2);
 
-	if (frame_width == undef) {
-		polygon([
-			[left, 0],
-			[right, 0],
-			[right, height],
-			[left, height]
-		]);
-	} else {
-		polygon([
-			[left, - frame_width],
-			[right, - frame_width],
-			[right, 0],
-			[left, 0]
-		]);
-	}
+	polygon([
+		[left, - padding],
+		[right, - padding],
+		[right, 0],
+		[left, 0]
+	]);
 }
 
-module border (padding = 0, round = 0) {
+module feet_border (padding = 0, round = 0, feet_num = 0) render() {
+	difference () {
+		polygon(
+			polyRound([
+				[0 - padding, 0 - padding, round],
+				[gh60_dim[0] + padding, 0 - padding, round],
+				[gh60_dim[0] + padding, 20 - padding, round],
+				[0 - padding, 20 - padding, round]
+			])
+		);
+
+		if (feet_num > 0) {
+			ha = holes_array(padding);
+			bp = (ha[2][0] - ha[0][0]) / feet_num;
+			for (i = [ 1 : feet_num - 1 ] ) {
+				translate([ha[0][0] + bp * i, 0])
+					circle(6);
+				translate([ha[2][0] + bp * i, 0])
+					circle(6);
+			}
+		}
+	}
+};
+
+module feet (thickness=10, padding = 10, round = 0, feet_num = 0) render() {
+	linear_extrude(thickness)
+		feet_border(padding, round, feet_num);
+
+	linear_extrude(thickness)
+		translate([0, gh60_dim[1] + 2 * padding - 20])
+			feet_border(padding, round, feet_num);
+}
+
+module border (padding = 0, round = 0) render() {
 	polygon(
 		polyRound([
 			[0 - padding, 0 - padding, round],
@@ -109,31 +150,35 @@ stabs = [
 	57.15
 ];
 
-function _stabWidth(x, y, i, width = 7) = [
-	x - stabs[i] - width / 2,
-	x + stabs[i] + width / 2,
-	y - 8,
-	y + 8
+stabs_hole = [7, 16];
+
+function _stabWidth(x, y, i, w, h) = [
+	x - stabs[i] - w / 2,
+	x + stabs[i] + w / 2,
+	y - h / 2,
+	y + h / 2
 ];
 
-function _stabPath(left, right, top, bottom, width = 7) = [
+function _stabPath(left, right, top, bottom, w) = [
 	[
 		[left, top],
-		[left + width, top],
-		[left + width, bottom],
+		[left + w, top],
+		[left + w, bottom],
 		[left, bottom]
 	],
 	[
 		[right, top],
-		[right - width, top],
-		[right - width, bottom],
+		[right - w, top],
+		[right - w, bottom],
 		[right, bottom]
 	]
 ];
 
-module  cut_stabs  (x, y, i, width = 7) {
-	s = _stabWidth(x, y, i, width);
-	p = _stabPath(s[0], s[1], s[2], s[3], width);
+module  cut_stabs (x, y, i, hole = stabs_hole) {
+	w = hole[0];
+	h = hole[1];
+	s = _stabWidth(x, y, i, w, h);
+	p = _stabPath(s[0], s[1], s[2], s[3], w);
 	polygon(p[0]);
 	polygon(p[1]);
 }
@@ -154,13 +199,13 @@ module cut_key (layout = default_layout, size = 14, simpleStab = false) {
 
 			// stab rect 7 x 16
 			if (w >= 7) {
-				cut_stabs(centerX, centerY, 3);
+				cut_stabs(centerX, centerY, 3, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 1.8] : stabs_hole);
 			} else if (w >= 6.25) {
-				cut_stabs(centerX, centerY, 2);
+				cut_stabs(centerX, centerY, 2, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 1.8] : stabs_hole);
 			} else if (w >= 3) {
-				cut_stabs(centerX, centerY, 1);
+				cut_stabs(centerX, centerY, 1, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 1.8] : stabs_hole);
 			} else if (w >= 2) {
-				cut_stabs(centerX, centerY, 0, simpleStab ? 10 : 7);
+				cut_stabs(centerX, centerY, 0, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 1.8] : stabs_hole);
 			}
 		}
 	}
@@ -168,99 +213,106 @@ module cut_key (layout = default_layout, size = 14, simpleStab = false) {
 
 module plate (layout = default_layout, thickness=1.5) {
 	difference() {
-		extrudeWithRadius(thickness, 0.2, 0.2, 5)
-			border(0, 2);
-		translate([0, 0, -1]) {
-			linear_extrude(thickness + 2) {
-				union () {
-					screws_cutoff();
-					cut_key(layout);
-				}
+		// extrudeWithRadius(thickness, 0.2, 0.2, 5)
+		linear_extrude(thickness)
+			difference() {
+				border(0);
+				screws_cutoff();
+				cut_key(layout);
 			}
-		}
 	}
 }
 
-module base (layout = default_layout, angle = 10, height=5, padding = 10) {
-	difference() {
-		translate([- padding, 0, 0])
-		rotate([90, 0, 90])
-		linear_extrude(gh60_dim[0] + padding * 2)
-		polygon([
-			[- padding, 0],
-			[gh60_dim[1] + padding, 0],
-			[gh60_dim[1] + padding, height],
-			[- padding, gh60_dim[1] * sin(angle) + height]
-		]);
-
-		linear_extrude(gh60_dim[0] + padding * 2)
-		border(border_buffer);
-	}
-}
-
-module usb_frame (thickness=10, padding = 10) {
+module usb_frame (thickness=10, padding = 10) render() {
 	linear_extrude(thickness)
 	difference() {
 		border(padding);
 		border(border_buffer);
 		usb_cutoff(padding);
+		structural_nuts(thickness, padding);
 	}
 }
 
-module top_frame (thickness=10, padding = 10) {
+module top_frame (thickness=10, padding = 10, mid_frame = false) render() {
 	linear_extrude(thickness)
 	difference() {
 		border(padding);
 		border(border_buffer);
+		if (mid_frame == true) structural_nuts(thickness, padding);
 	}
 }
 
-module reinforce(layout = default_layout, thickness=10, padding = 10, screw = 1) {
-	union () {
-		difference() {
-			linear_extrude(thickness)
-			// extrudeWithRadius(thickness, 0.2, 0.2, 5)
-				border(padding, 0);
-			translate([0, 0, -1]) {
-				linear_extrude(thickness + 2) {
-					union () {
-						// cleaner cut
-						button_cutoff(key_size, 12);
-						screws_cutoff(screw);
-						// 15.6, see mx spec
-						// moded to 16.8 for cleaner stab cutoff
-						cut_key(layout, 16.8, true);
-						// usb_cutoff(padding);
-					}
-				}
+module reinforce(layout = default_layout, thickness=10, padding = 10) render() {
+	linear_extrude(thickness)
+	difference() {
+		// extrudeWithRadius(thickness, 0.2, 0.2, 5)
+		border(padding);
+
+		button_cutoff(key_size, 12);
+		screws_cutoff(screw_hole_d[M2] / 2);
+		// 15.6, see mx spec
+		// moded to 16.8 for cleaner stab cutoff
+		cut_key(layout, 16.8, true);
+
+		structural_nuts(thickness, padding);
+	}
+}
+
+module flat_plate(thickness=10, padding = 10) render() {
+	linear_extrude(thickness)
+		border(padding);
+}
+
+function get_plate_z(k, thickness, seperator) = - k * (thickness + seperator);
+
+module print_plates(layout = default_layout, thickness = 3, padding = 10, seperator = 10) {
+	plates = [5, 5, 4, 3, 3, 2, 1, 0, 0];
+
+	difference() {
+		for (k = [ 0 : len(plates) - 1 ] ) {
+			p = plates[k];
+
+			translate([0, 0, get_plate_z(k, thickness, seperator)]) {
+				if (p == 0) top_frame(thickness, padding, k != len(plates) - 1);
+				if (p == 1) plate(layout, 1.5);
+				if (p == 2) reinforce(layout, thickness, padding);
+				if (p == 3) usb_frame(thickness, padding);
+				if (p == 4) flat_plate(thickness, padding);
+				if (p == 5) feet(thickness, padding, 0, k == 0 ? 4 : 0);
 			}
 		}
-		top_frame(thickness, padding);
+
+		translate([0, 0, get_plate_z(0, thickness, seperator)])
+			structural_screws(thickness, padding, true);
+
+		translate([0, 0, get_plate_z(len(plates) - 1, thickness, seperator)])
+			structural_screws(thickness, padding);
 	}
 }
 
-module case(layout = default_layout, angle = 6, padding = 10, top = 8, rein = 3.5, mid = 6, bottom = 0, reinforce_screw = 1, seperator = 0) {
-	render () {
-		union () {
-			translate([0, 0, - mid - rein - top - 3 * seperator])
-				top_frame(top, padding);
-			translate([0, 0, - mid - rein - 2 * seperator])
-				reinforce(layout, rein, padding, reinforce_screw);
-			translate([0, 0, - mid - seperator])
-				usb_frame(mid, padding);
+module flat_head_M2 () render () {
+	screw_hole(ISO2009, M2, 10, 0, $fn);
+}
 
-				if (angle < 0) {
-					difference() {
-					translate([gh60_dim[0], gh60_dim[1], 0])
-					scale([-1, -1, 1])
-					base(layout, abs(angle), bottom, padding);
+module structural_screws (thickness, padding, isTop) {
+	holes = holes_array(padding);
 
-					linear_extrude(bottom + big_value)
-					usb_cutoff(padding);
-					}
-				} else {
-					base(layout, angle, bottom, padding);
-				}
+	for (i = holes) {
+		translate([i[0],i[1], isTop ? thickness : 0]) {
+			if (isTop == true) {
+				rotate([0, 180, 0])
+				flat_head_M2();
+			} else {
+				flat_head_M2();
+			}
+		}
+	}
+}
+
+module structural_nuts (thickness, padding, z) {
+	for (i = holes_array(padding)) {
+		translate([i[0], i[1]]) {
+			circle(screw_standard[ISO2009][screw_hole_dk][M2] / 2);
 		}
 	}
 }
