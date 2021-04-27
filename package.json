@@ -6,8 +6,7 @@
   "author": "tommy chan",
   "license": "MIT",
   "scripts": {
-    "case": "node cli.js case",
-    "plate": "node cli.js plate"
+    "case": "node cli.js"
   },
   "dependencies": {
     "minimist": "^1.2.5"

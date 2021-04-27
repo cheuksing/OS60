@@ -1,7 +1,7 @@
 include <./polyround.scad>;
 include <./screw_holes.scad>;
 
-$fn=8;
+$fn=14;
 // I don't want to do calculations
 big_value = 100;
 border_buffer = 0.3;
@@ -148,7 +148,7 @@ module feets (thickness=10, padding = 10, rXY = M2_hole_dk_r, rZ = 1.5, isBottom
 	offset =  padding + rXY + rZ;
 
 	intersection () {
-		extrudeWithRadius(thickness, rZ, rZ, $fn)
+		extrudeWithRadius(thickness, rZ, rZ, 5)
 			front_feet_border(offset, rXY);
 
 		if (!isBottom) bottom_plate(thickness, offset, M2_hole_d_r);
@@ -158,7 +158,7 @@ module feets (thickness=10, padding = 10, rXY = M2_hole_dk_r, rZ = 1.5, isBottom
 	}
 
 	intersection () {
-		extrudeWithRadius(thickness, rZ, rZ, $fn)
+		extrudeWithRadius(thickness, rZ, rZ, 5)
 			back_feet_border(offset, rXY);
 
 		if (!isBottom) bottom_plate(thickness, offset, M2_hole_d_r);
@@ -249,13 +249,13 @@ module cut_key (layout = default_layout, size = 14, simpleStab = false) {
 
 			// stab rect 7 x 16
 			if (w >= 7) {
-				cut_stabs(centerX, centerY, 3, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 1.8] : stabs_hole);
+				cut_stabs(centerX, centerY, 3, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 2.5] : stabs_hole);
 			} else if (w >= 6.25) {
-				cut_stabs(centerX, centerY, 2, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 1.8] : stabs_hole);
+				cut_stabs(centerX, centerY, 2, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 2.5] : stabs_hole);
 			} else if (w >= 3) {
-				cut_stabs(centerX, centerY, 1, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 1.8] : stabs_hole);
+				cut_stabs(centerX, centerY, 1, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 2.5] : stabs_hole);
 			} else if (w >= 2) {
-				cut_stabs(centerX, centerY, 0, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 1.8] : stabs_hole);
+				cut_stabs(centerX, centerY, 0, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 2.5] : stabs_hole);
 			}
 		}
 	}
@@ -318,14 +318,24 @@ module bottom_plate(thickness=10, padding = 10) {
 
 module flat_plate(thickness=10, padding = 10, rXY = M2_hole_dk_r, rZ = 1.5) render() {
 	// linear_extrude(thickness)
-	extrudeWithRadius(thickness, rZ, rZ, $fn)
+	extrudeWithRadius(thickness, rZ, rZ, 5)
 		border(padding + rXY + rZ, rXY);
 }
 
 function get_plate_z(k, thickness, seperator) = - k * (thickness + seperator);
 
+colors = [
+  [255 / 255, 92 / 255, 87 / 255],
+  [90 / 255, 247 / 255, 142 / 255],
+  [243 / 255, 249 / 255, 157 / 255],
+  [87 / 255, 199 / 255, 255 / 255],
+  [255 / 255, 106 / 255, 193 / 255],
+  [154 / 255, 237 / 255, 254 / 255],
+];
+
 module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = M2_hole_dk_r, rZ = 1.5, seperator = 10) {
 	plates = [5, 5, 4, 3, 3, 2, 1, 0, 0];
+	// plates = [2, 1];
 	offset =  padding + rXY + rZ;
 
 	difference() {
@@ -334,28 +344,28 @@ module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = 
 
 			translate([0, 0, get_plate_z(k, thickness, seperator)]) {
 				if (p == 0) {
-					intersection () {
+					color (colors[0]) intersection () {
 						top_frame(thickness, offset, k != len(plates) - 1);
 						flat_plate(thickness, padding);
 					}
-				} else if (p == 1) plate(layout, 1.5);
+				} else if (p == 1) color (colors[1]) plate(layout, 1.5);
 				else if (p == 2) {
-					intersection () {
+					color (colors[2]) intersection () {
 						reinforce(layout, thickness, offset);
 						flat_plate(thickness, padding);
 					}
 				} else if (p == 3) {
-					intersection () {
+					color (colors[3]) intersection () {
 						usb_frame(thickness, offset);
 						flat_plate(thickness, padding);
 					}
 				} else if (p == 4) {
-					intersection () {
+					color (colors[4]) intersection () {
 						bottom_plate(thickness, offset);
 						flat_plate(thickness, padding);
 					}
 				} else if (p == 5) {
-					feets(thickness, padding, rXY, rZ, k == 0);
+					color (colors[5]) feets(thickness, padding, rXY, rZ, k == 0);
 				}
 			}
 		}
