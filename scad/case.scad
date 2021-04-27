@@ -17,7 +17,7 @@ default_layout = [[[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[
 M2_hole_dk_r=screw_standard[ISO2009][screw_hole_dk][M2] / 2;
 M2_hole_d_r=screw_standard[ISO2009][screw_hole_d][M2] / 2;
 
-function holes_offset(padding) = (padding - border_buffer) / 2;
+function holes_offset(padding) = (padding - border_buffer) / 2 + border_buffer;
 
 function holes_array(padding) = [
 	// left-top
@@ -88,83 +88,83 @@ module usb_cutoff (padding) {
 	]);
 }
 
-module front_feet_border (padding = 0, rXY = M2_hole_dk_r) render() {
+module front_feet_border (outline, rXY = M2_hole_dk_r) render() {
 	polygon(
 		polyRound([
-			[0 - padding, 0 - padding, rXY],
-			[gh60_dim[0] + padding, 0 - padding, rXY],
-			[gh60_dim[0] + padding, 20 - padding, rXY],
-			[0 - padding, 20 - padding, rXY]
+			[0 - outline, 0 - outline, rXY],
+			[gh60_dim[0] + outline, 0 - outline, rXY],
+			[gh60_dim[0] + outline, 20 - outline, rXY],
+			[0 - outline, 20 - outline, rXY]
 		])
 	);
 };
 
-module back_feet_border (padding = 0, rXY = M2_hole_dk_r) render() {
+module back_feet_border (outline, rXY = M2_hole_dk_r) render() {
 	polygon(
 		polyRound([
-			[0 - padding, gh60_dim[1] + padding, rXY],
-			[gh60_dim[0] + padding, gh60_dim[1] + padding, rXY],
-			[gh60_dim[0] + padding, gh60_dim[1] + padding - 20, rXY],
-			[0 - padding, gh60_dim[1] + padding - 20, rXY]
+			[0 - outline, gh60_dim[1] + outline, rXY],
+			[gh60_dim[0] + outline, gh60_dim[1] + outline, rXY],
+			[gh60_dim[0] + outline, gh60_dim[1] + outline - 20, rXY],
+			[0 - outline, gh60_dim[1] + outline - 20, rXY]
 		])
 	);
 };
 
-module front_feet_border_with_holes (padding = 0, rXY = M2_hole_dk_r, feet_num = 0) {
+module front_feet_border_with_holes (padding, outline, rXY = M2_hole_dk_r, feet_num = 0) {
 	difference () {
-		front_feet_border (padding, rXY);
+		front_feet_border (outline, rXY);
 
 		if (feet_num > 0) {
 			ha = holes_array(padding);
 			bp = (ha[2][0] - ha[0][0]) / feet_num;
 			for (i = [ 1 : feet_num - 1 ] ) {
-				translate([ha[0][0] + bp * i, ha[0][1] + (20 - padding) / 2])
+				translate([ha[0][0] + bp * i, 0 - outline + 10])
 					circle(6);
-				translate([ha[2][0] + bp * i, ha[0][1] + (20 - padding) / 2])
+				translate([ha[2][0] + bp * i, 0 - outline + 10])
 					circle(6);
 			}
 		}
 	}
 }
 
-module back_feet_border_with_holes (padding = 0, rXY = M2_hole_dk_r, feet_num = 0) {
+module back_feet_border_with_holes (padding, outline, rXY = M2_hole_dk_r, feet_num = 0) {
 	difference () {
-		back_feet_border (padding, rXY);
+		back_feet_border (outline, rXY);
 
 		if (feet_num > 0) {
 			ha = holes_array(padding);
 			bp = (ha[5][0] - ha[3][0]) / feet_num;
 			for (i = [ 1 : feet_num - 1 ] ) {
-				translate([ha[3][0] + bp * i, ha[3][1] - (20 - padding) / 2])
+				translate([ha[3][0] + bp * i, gh60_dim[1] + outline - 10])
 					circle(6);
-				translate([ha[5][0] + bp * i, ha[3][1] - (20 - padding) / 2])
+				translate([ha[5][0] + bp * i, gh60_dim[1] + outline - 10])
 					circle(6);
 			}
 		}
 	}
 }
 
-module feets (thickness=10, padding = 10, rXY = M2_hole_dk_r, rZ = 1.5, isBottom = false) render() {
-	offset =  padding + rXY + rZ;
+module feets (thickness, padding, rXY = M2_hole_dk_r, rZ = 1.5, isBottom = false) render() {
+	outline =  padding + max(rXY, rZ);
 
 	intersection () {
 		extrudeWithRadius(thickness, rZ, rZ, 5)
-			front_feet_border(offset, rXY);
+			front_feet_border(outline, rXY);
 
-		if (!isBottom) bottom_plate(thickness, offset, M2_hole_d_r);
+		if (!isBottom) bottom_plate(thickness, padding, outline);
 
 		linear_extrude(thickness)
-			front_feet_border_with_holes(offset, rXY, isBottom ? 4 : 0);
+			front_feet_border_with_holes(padding, outline, rXY, isBottom ? 4 : 0);
 	}
 
 	intersection () {
 		extrudeWithRadius(thickness, rZ, rZ, 5)
-			back_feet_border(offset, rXY);
+			back_feet_border(outline, rXY);
 
-		if (!isBottom) bottom_plate(thickness, offset, M2_hole_d_r);
+		if (!isBottom) bottom_plate(thickness, padding, outline);
 
 		linear_extrude(thickness)
-			back_feet_border_with_holes(offset, rXY, isBottom ? 4 : 0);
+			back_feet_border_with_holes(padding, outline, rXY, isBottom ? 4 : 0);
 	}
 }
 
@@ -263,7 +263,6 @@ module cut_key (layout = default_layout, size = 14, simpleStab = false) {
 
 module plate (layout = default_layout, thickness=1.5) {
 	difference() {
-		// extrudeWithRadius(thickness, 0.2, 0.2, 5)
 		linear_extrude(thickness)
 			difference() {
 				border(0);
@@ -273,30 +272,30 @@ module plate (layout = default_layout, thickness=1.5) {
 	}
 }
 
-module usb_frame (thickness=10, padding = 10) render() {
+module usb_frame (thickness, padding, outline) render() {
 	linear_extrude(thickness)
 	difference() {
-		border(padding);
+		border(outline);
 		border(border_buffer);
 		usb_cutoff(padding);
 		structural_nuts(thickness, padding);
 	}
 }
 
-module top_frame (thickness=10, padding = 10, mid_frame = false) render() {
+module top_frame (thickness, padding, outline, mid_frame = false) render() {
 	linear_extrude(thickness)
 	difference() {
-		border(padding);
+		border(outline);
 		border(border_buffer);
 		if (mid_frame == true) structural_nuts(thickness, padding);
 	}
 }
 
-module reinforce(layout = default_layout, thickness=10, padding = 10) render() {
+module reinforce(layout = default_layout, thickness, padding, outline) render() {
 	linear_extrude(thickness)
 	difference() {
 		// extrudeWithRadius(thickness, 0.2, 0.2, 5)
-		border(padding);
+		border(outline);
 
 		button_cutoff(key_size, 12);
 		screws_cutoff(screw_hole_d[M2] / 2);
@@ -308,10 +307,10 @@ module reinforce(layout = default_layout, thickness=10, padding = 10) render() {
 	}
 }
 
-module bottom_plate(thickness=10, padding = 10) {
+module bottom_plate(thickness, padding, outline) {
 	linear_extrude(thickness)
 		difference() {
-			border(padding);
+			border(outline);
 			structural_nuts(thickness, padding, screw_hole_d);
 		}
 }
@@ -319,7 +318,7 @@ module bottom_plate(thickness=10, padding = 10) {
 module flat_plate(thickness=10, padding = 10, rXY = M2_hole_dk_r, rZ = 1.5) render() {
 	// linear_extrude(thickness)
 	extrudeWithRadius(thickness, rZ, rZ, 5)
-		border(padding + rXY + rZ, rXY);
+		border(padding, rXY);
 }
 
 function get_plate_z(k, thickness, seperator) = - k * (thickness + seperator);
@@ -336,7 +335,7 @@ colors = [
 module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = M2_hole_dk_r, rZ = 1.5, seperator = 10) {
 	plates = [5, 5, 4, 3, 3, 2, 1, 0, 0];
 	// plates = [2, 1];
-	offset =  padding + rXY + rZ;
+	offset =  padding + max(rXY, rZ);
 
 	difference() {
 		for (k = [ 0 : len(plates) - 1 ] ) {
@@ -345,24 +344,24 @@ module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = 
 			translate([0, 0, get_plate_z(k, thickness, seperator)]) {
 				if (p == 0) {
 					color (colors[0]) intersection () {
-						top_frame(thickness, offset, k != len(plates) - 1);
-						flat_plate(thickness, padding);
+						top_frame(thickness, padding, offset, k != len(plates) - 1);
+						flat_plate(thickness, offset);
 					}
 				} else if (p == 1) color (colors[1]) plate(layout, 1.5);
 				else if (p == 2) {
 					color (colors[2]) intersection () {
-						reinforce(layout, thickness, offset);
-						flat_plate(thickness, padding);
+						reinforce(layout, thickness, padding, offset);
+						flat_plate(thickness, offset);
 					}
 				} else if (p == 3) {
 					color (colors[3]) intersection () {
-						usb_frame(thickness, offset);
-						flat_plate(thickness, padding);
+						usb_frame(thickness, padding, offset);
+						flat_plate(thickness, offset);
 					}
 				} else if (p == 4) {
 					color (colors[4]) intersection () {
-						bottom_plate(thickness, offset);
-						flat_plate(thickness, padding);
+						bottom_plate(thickness, padding, offset);
+						flat_plate(thickness, offset);
 					}
 				} else if (p == 5) {
 					color (colors[5]) feets(thickness, padding, rXY, rZ, k == 0);
@@ -371,10 +370,10 @@ module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = 
 		}
 
 		translate([0, 0, get_plate_z(0, thickness, seperator)])
-			structural_screws(thickness, offset, true);
+			structural_screws(thickness, padding, true);
 
 		translate([0, 0, get_plate_z(len(plates) - 1, thickness, seperator)])
-			structural_screws(thickness, offset);
+			structural_screws(thickness, padding);
 	}
 }
 

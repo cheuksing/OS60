@@ -25,7 +25,7 @@ const MIN_PADDING = 5;
 const {
   _: [filePath],
   thickness = 3,
-  padding = MIN_PADDING,
+  padding = 10,
   rXY,
   rZ,
 } = require("minimist")(process.argv.slice(2));
