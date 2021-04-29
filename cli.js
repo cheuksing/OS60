@@ -26,8 +26,8 @@ const {
   _: [filePath],
   thickness = 3,
   padding = 10,
-  rXY,
-  rZ,
+  rXY = 1.9,
+  rZ = 0,
 } = require("minimist")(process.argv.slice(2));
 
 if (filePath) {
