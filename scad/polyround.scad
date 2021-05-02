@@ -537,7 +537,7 @@ module extrudeWithRadius(length,r1=0,r2=0,fn=30){
       children();
     }
   }
-  for(i=[0:fn-1]){
+  for(i=[0:fn]){
     translate([0,0,i/fn*r1]){
       linear_extrude(r1/fn+0.01){
         offset(n1*sqrt(sq(r1)-sq(r1-i/fn*r1))-n1*r1){
@@ -545,7 +545,7 @@ module extrudeWithRadius(length,r1=0,r2=0,fn=30){
         }
       }
     }
-    translate([0,0,length-r2+i/fn*r2]){
+    translate([0,0,length-r2+(i - 1)/fn*r2]){
       linear_extrude(r2/fn+0.01){
         offset(n2*sqrt(sq(r2)-sq(i/fn*r2))-n2*r2){
           children();
