@@ -85,97 +85,87 @@ module usb_cutoff (padding) {
 	]);
 }
 
-module front_feet_border (outline, rXY = M2_dk_r) render() {
-	polygon(
-		polyRound([
-			[0 - outline, 0 - outline, rXY],
-			[gh60_dim[0] + outline, 0 - outline, rXY],
-			[gh60_dim[0] + outline, 20 - outline, rXY],
-			[0 - outline, 20 - outline, rXY]
-		])
-	);
+module front_feet_border (outline, rXY = M2_dk_r) {
+	polygon([
+		[0 - outline, 0 - outline],
+		[gh60_dim[0] + outline, 0 - outline],
+		[gh60_dim[0] + outline, 20 - outline],
+		[0 - outline, 20 - outline],
+	]);
 };
 
-module back_feet_border (outline, rXY = M2_dk_r) render() {
-	polygon(
-		polyRound([
-			[0 - outline, gh60_dim[1] + outline, rXY],
-			[gh60_dim[0] + outline, gh60_dim[1] + outline, rXY],
-			[gh60_dim[0] + outline, gh60_dim[1] + outline - 20, rXY],
-			[0 - outline, gh60_dim[1] + outline - 20, rXY]
-		])
-	);
+module back_feet_border (outline, rXY = M2_dk_r) {
+	polygon([
+		[0 - outline, gh60_dim[1] + outline],
+		[gh60_dim[0] + outline, gh60_dim[1] + outline],
+		[gh60_dim[0] + outline, gh60_dim[1] + outline - 20],
+		[0 - outline, gh60_dim[1] + outline - 20],
+	]);
 };
 
-module front_feet_border_with_holes (padding, outline, rXY = M2_dk_r, feet_num = 0) {
+module front_feet_border_with_holes (padding, outline, rXY = M2_dk_r, feet_num = 4) {
 	difference () {
 		front_feet_border (outline, rXY);
 
-		if (feet_num > 0) {
-			ha = holes_array(padding);
-			bp = (ha[2][0] - ha[0][0]) / feet_num;
-			for (i = [ 1 : feet_num - 1 ] ) {
-				translate([ha[0][0] + bp * i, 0 - outline + 10])
-					circle(6);
-				translate([ha[2][0] + bp * i, 0 - outline + 10])
-					circle(6);
-			}
+		ha = holes_array(padding);
+		bp = (ha[2][0] - ha[0][0]) / feet_num;
+		for (i = [ 1 : feet_num - 1 ] ) {
+			translate([ha[0][0] + bp * i, 0 - outline + 10])
+				circle(6);
+			translate([ha[2][0] + bp * i, 0 - outline + 10])
+				circle(6);
 		}
 	}
 }
 
-module back_feet_border_with_holes (padding, outline, rXY = M2_dk_r, feet_num = 0) {
+module back_feet_border_with_holes (padding, outline, rXY = M2_dk_r, feet_num = 4) {
+	ha = holes_array(padding);
+	bp = (ha[5][0] - ha[3][0]) / feet_num;
+
 	difference () {
 		back_feet_border (outline, rXY);
 
-		if (feet_num > 0) {
-			ha = holes_array(padding);
-			bp = (ha[5][0] - ha[3][0]) / feet_num;
-			for (i = [ 1 : feet_num - 1 ] ) {
-				translate([ha[3][0] + bp * i, gh60_dim[1] + outline - 10])
-					circle(6);
-				translate([ha[5][0] + bp * i, gh60_dim[1] + outline - 10])
-					circle(6);
-			}
+		for (i = [ 1 : feet_num - 1 ] ) {
+			translate([ha[3][0] + bp * i, gh60_dim[1] + outline - 10])
+				circle(6);
+			translate([ha[5][0] + bp * i, gh60_dim[1] + outline - 10])
+				circle(6);
 		}
 	}
 }
 
-module feets_extends (thickness, padding, rXY = M2_dk_r, rZ = 1.5) render() {
+module feets_extends (thickness, padding, rXY = M2_dk_r, rZ = 1.5) {
 	outline =  padding + max(rXY, rZ);
 
 	linear_extrude(thickness)
 		difference () {
-			front_feet_border(outline, rXY);
-			structural_nuts(thickness, padding, M2_d);
-		}
-
-	linear_extrude(thickness)
-		difference () {
-			back_feet_border(outline, rXY);
-			structural_nuts(thickness, padding, M2_d);
+			union () {
+				front_feet_border(outline, rXY);
+				back_feet_border(outline, rXY);
+			}
+				structural_nuts(thickness, padding, M2_d);
 		}
 }
 
-module feets (thickness, padding, rXY = M2_dk_r, rZ = 1.5) render() {
+module feets (thickness, padding, rXY = M2_dk_r, rZ = 1.5) {
 	outline =  padding + max(rXY, rZ);
 
-	linear_extrude(thickness)
-		front_feet_border_with_holes(padding, outline, rXY, 4);
+	union () {
+		linear_extrude(thickness)
+			front_feet_border_with_holes(padding, outline, rXY);
 
-	linear_extrude(thickness)
-		back_feet_border_with_holes(padding, outline, rXY, 4);
+		linear_extrude(thickness)
+			back_feet_border_with_holes(padding, outline, rXY);
+	}
 }
 
-module border (padding = 0, round = 0) render() {
-	polygon(
-		polyRound([
-			[0 - padding, 0 - padding, round],
-			[gh60_dim[0] + padding, 0 - padding, round],
-			[gh60_dim[0] + padding, gh60_dim[1] + padding, round],
-			[0 - padding, gh60_dim[1] + padding, round]
-		])
-	);
+module border (padding = 0, round = 0) {
+	polygon([
+		[0 - padding, 0 - padding],
+		[gh60_dim[0] + padding, 0 - padding],
+		[gh60_dim[0] + padding, gh60_dim[1] + padding],
+		[0 - padding, gh60_dim[1] + padding]
+	]);
 };
 
 function getCenterX(list, c = 0, stop) = 
@@ -271,7 +261,7 @@ module plate (layout = default_layout, thickness=1.5) {
 	}
 }
 
-module usb_frame (thickness, padding, outline) render() {
+module usb_frame (thickness, padding, outline) {
 	linear_extrude(thickness)
 	difference() {
 		border(outline);
@@ -281,16 +271,24 @@ module usb_frame (thickness, padding, outline) render() {
 	}
 }
 
-module top_frame (thickness, padding, outline, mid_frame = false) render() {
+module topest_frame (thickness, padding, outline) {
 	linear_extrude(thickness)
 	difference() {
 		border(outline);
 		border(border_buffer);
-		if (mid_frame == true) structural_nuts(thickness, padding);
 	}
 }
 
-module reinforce(layout = default_layout, thickness, padding, outline) render() {
+module top_frame (thickness, padding, outline) {
+	linear_extrude(thickness)
+	difference() {
+		border(outline);
+		border(border_buffer);
+		structural_nuts(thickness, padding);
+	}
+}
+
+module reinforce(layout = default_layout, thickness, padding, outline) {
 	linear_extrude(thickness)
 	difference() {
 		// extrudeWithRadius(thickness, 0.2, 0.2, 5)
@@ -314,7 +312,7 @@ module bottom_plate(thickness, padding, outline) {
 		}
 }
 
-module flat_plate(thickness=10, padding = 10, rXY = M2_dk_r, rZ = 1.5) render() {
+module flat_plate(thickness=10, padding = 10, rXY = M2_dk_r, rZ = 1.5) {
 	// linear_extrude(thickness)
 	linear_extrude(thickness)
 		border(padding, rXY);
@@ -323,18 +321,19 @@ module flat_plate(thickness=10, padding = 10, rXY = M2_dk_r, rZ = 1.5) render() 
 function get_plate_z(k, thickness, seperator) = - k * (thickness + seperator);
 
 colors = [
-  [255 / 255, 92 / 255, 87 / 255],
-  [90 / 255, 247 / 255, 142 / 255],
-  [243 / 255, 249 / 255, 157 / 255],
-  [87 / 255, 199 / 255, 255 / 255],
-  [255 / 255, 106 / 255, 193 / 255],
-  [154 / 255, 237 / 255, 254 / 255],
-	[104 / 255, 104 / 255, 104 / 255],
+	"#686868",
+	"#ff5c57",
+	"#5af78e",
+	"#f3f99d",
+	"#57c7ff",
+	"#ff6ac1",
+	"#9932CC",
+	"#eff0eb",
 ];
 
 module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = M2_dk_r, rZ = 1.5, seperator = 10) {
-	plates = [6, 5, 4, 3, 3, 2, 1, 0, 0];
-	// plates = [2, 1];
+	plates = [7, 6, 5, 4, 4, 3, 2, 1, 0];
+	// plates = [7, 6, 5, 4, 4, 3, 1, 0];
 	offset =  padding + max(rXY, rZ);
 
 	difference() {
@@ -343,52 +342,46 @@ module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = 
 
 			translate([0, 0, get_plate_z(k, thickness, seperator)]) {
 				if (p == 0) {
-					color (colors[0]) intersection () {
-						top_frame(thickness, padding, offset, k != len(plates) - 1);
-						flat_plate(thickness, offset);
+					color (colors[0]) {
+						difference () {
+							topest_frame(thickness, padding, offset);
+							structural_screws(thickness, padding);
+						}
 					}
-				} else if (p == 1) color (colors[1]) plate(layout, 1.5);
-				else if (p == 2) {
-					color (colors[2]) intersection () {
-						reinforce(layout, thickness, padding, offset);
-						flat_plate(thickness, offset);
-					}
-				} else if (p == 3) {
-					color (colors[3]) intersection () {
-						usb_frame(thickness, padding, offset);
-						flat_plate(thickness, offset);
-					}
+				} else if (p == 1) {
+					color (colors[1]) top_frame(thickness, padding, offset);
+				} else if (p == 2) color (colors[2]) plate(layout, 1.5);
+				else if (p == 3) {
+					color (colors[3]) reinforce(layout, thickness, padding, offset);
 				} else if (p == 4) {
-					color (colors[4]) intersection () {
-						bottom_plate(thickness, padding, offset);
-						flat_plate(thickness, offset);
-					}
+					color (colors[4]) usb_frame(thickness, padding, offset);
 				} else if (p == 5) {
-					color (colors[5]) feets_extends(thickness, padding, rXY, rZ);
+					color (colors[5]) bottom_plate(thickness, padding, offset);
 				} else if (p == 6) {
-					color (colors[6]) feets(thickness, padding, rXY, rZ);
+					color (colors[6]) feets_extends(thickness, padding, rXY, rZ);
+				} else if (p == 7) {
+					color (colors[7]) {
+						difference () {
+							feets(thickness, padding, rXY, rZ);
+							structural_screws(thickness, padding, true);
+						}
+					}
 				}
 			}
 		}
-
-		translate([0, 0, get_plate_z(0, thickness, seperator)])
-			structural_screws(thickness, padding, true);
-
-		translate([0, 0, get_plate_z(len(plates) - 1, thickness, seperator)])
-			structural_screws(thickness, padding);
 	}
 }
 
-module flat_head_M2 () render () {
+module flat_head_M2 () {
 	screw_hole(l = 10, fn = $fn);
 }
 
-module structural_screws (thickness, padding, isTop) {
+module structural_screws (thickness, padding, flip) {
 	holes = holes_array(padding);
 
 	for (i = holes) {
-		translate([i[0],i[1], isTop ? thickness : 0]) {
-			if (isTop == true) {
+		translate([i[0],i[1], flip ? thickness : 0]) {
+			if (flip == true) {
 				rotate([0, 180, 0])
 				flat_head_M2();
 			} else {
@@ -398,10 +391,10 @@ module structural_screws (thickness, padding, isTop) {
 	}
 }
 
-module structural_nuts (thickness, padding, r = M2_dk_r) {
+module structural_nuts (thickness, padding, d = M2_dk) {
 	for (i = holes_array(padding)) {
 		translate([i[0], i[1]]) {
-			circle(r);
+			circle(d = d);
 		}
 	}
 }
