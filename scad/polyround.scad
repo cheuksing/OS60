@@ -533,7 +533,7 @@ module extrudeWithRadius(length,r1=0,r2=0,fn=30){
   n1=sign(r1);n2=sign(r2);
   r1=abs(r1);r2=abs(r2);
   translate([0,0,r1]){
-    linear_extrude(length-r1-r2){
+    linear_extrude(max(length-r1-r2, 0.01)){
       children();
     }
   }

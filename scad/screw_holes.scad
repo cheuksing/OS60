@@ -23,9 +23,11 @@ screw_hole_height_extend = 0.1;          // Extra distance the hole extends abov
 screw_hole_cylinderhead_spacing = 0.1;   // Extra radius of hole around screw head.
 screw_hole_countersunk_delta = 0.1;      // Extra depth of countersunk screw hole.
 
+// also works for radius
+function get_hole_dia(d = M2_d, fn = $fn) = d / cos(180 / fn);
 
-module head (dk, k, d) {
-  cylinder(h = k, d1 = dk, d2 = d);
+module hole(r) {
+  circle(get_hole_dia(r));
 }
 
 module screw_hole (d = M2_d, dk = M2_dk, k = M2_k, l = 10, fn = $fn) {
@@ -35,36 +37,7 @@ module screw_hole (d = M2_d, dk = M2_dk, k = M2_k, l = 10, fn = $fn) {
   cb = ch * tt;
 
   translate ([0, 0, -screw_hole_height_extend]) {
-    cylinder(h = l + screw_hole_height_extend, d = d);
-    cylinder(d1 = cb, d2 = d, h = ch - (d / tt));
+    cylinder(h = l + screw_hole_height_extend, d = get_hole_dia(d));
+    cylinder(d1 = get_hole_dia(cb), d2 = get_hole_dia(d), h = ch - (d / tt));
   }
-}
-
-
-// Draw a hole of fn segments that fits around a cylinder with radius.
-module sh_cylinder_outer(height, radius, fn)
-{
-  fudge = 1 / cos(180 / fn);
-  cylinder(h = height, r = radius * fudge, $fn = fn);
-}
-
-// Draw a cone of height, in fn segments, that at its top fits around a cylinder with radius.
-module sh_cone_outer(height, radius, fn)
-{
-  fudge = 1 / cos(180 / fn);
-  translate([0, 0, height / 2])
-    cylinder(height, radius * fudge, 0, true, $fn = fn);
-}
-
-module screw_hole1(d = M2_d, dk = M2_dk, k = M2_k, l = 10, fn = screw_hole_fn)
-{
-  tt = 2;	// Ratio between base and height of cone.
-  pk = d / tt;
-  ch = pk + (k + screw_hole_countersunk_delta) + screw_hole_height_extend;
-  cb = ch * tt;
-
-  // sh_cylinder_outer(l + screw_hole_length_extend, d / 2, fn);
-
-  // translate([0, 0, -screw_hole_height_extend])
-  //   sh_cone_outer(ch, cb / 2, fn);
 }

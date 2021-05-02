@@ -14,21 +14,21 @@ gh60_holes_radius = 2.5;
 
 default_layout = [[[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[2,1,0,0]],[[1.5,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1.5,1,0,0]],[[1.75,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[2.25,1,0,0]],[[2.25,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[1,1,0,0],[2.75,1,0,0]],[[1.25,1,0,0],[1.25,1,0,0],[1.25,1,0,0],[6.25,1,0,0],[1.25,1,0,0],[1.25,1,0,0],[1.25,1,0,0],[1.25,1,0,0]]];
 
-function holes_offset(padding) = (padding - border_buffer) / 2 + border_buffer;
+function holes_offset(padding) = (padding) / 2 + border_buffer;
 
 function holes_array(padding) = [
 	// left-top
 	[0 - holes_offset(padding), 0 - holes_offset(padding)],
 	// middle-top
-	[gh60_dim[0] + holes_offset(padding), 0 - holes_offset(padding)],
+	[(gh60_dim[0] + holes_offset(padding) * 2) / 2, 0 - holes_offset(padding)],
 	// right-top
-	[(gh60_dim[0] + 2 * holes_offset(padding)) / 2, 0 - holes_offset(padding)],
+	[gh60_dim[0] + holes_offset(padding), 0 - holes_offset(padding)],
 	// left-bottom
 	[0 - holes_offset(padding), gh60_dim[1] + holes_offset(padding)],
 	// middle-bottom
-	[gh60_dim[0] + holes_offset(padding), gh60_dim[1] + holes_offset(padding)],
+	[(gh60_dim[0] + holes_offset(padding) * 2) / 2, gh60_dim[1] + holes_offset(padding)],
 	// right-bottom
-	[(gh60_dim[0] + 2 * holes_offset(padding)) / 2, gh60_dim[1] + holes_offset(padding)],
+	[gh60_dim[0] + holes_offset(padding), gh60_dim[1] + holes_offset(padding)],
 ];
 
 module screws_cutoff (holes_radius = gh60_holes_radius) {
@@ -41,21 +41,21 @@ module screws_cutoff (holes_radius = gh60_holes_radius) {
 
 	for (i = holes) {
 		translate([i[0],i[1], 0])
-			circle(holes_radius);
+			hole(holes_radius);
 	}
 
 	translate([1.5, 56.5])
 	hull() {
 		translate([-3.5, 0, 0])
-			circle(holes_radius);
-			circle(holes_radius);
+			hole(holes_radius);
+			hole(holes_radius);
 	}
 
 	translate([gh60_dim[0] - 1.5, 56.5])
 	hull() {
 		translate([3.5, 0, 0])
-			circle(holes_radius);
-			circle(holes_radius);
+			hole(holes_radius);
+			hole(holes_radius);
 	}
 };
 
@@ -85,55 +85,55 @@ module usb_cutoff (padding) {
 	]);
 }
 
-module front_feet_border (outline, rXY = 0) {
-	polygon(
-		polyRound([
-			[0 - outline, 0 - outline, rXY],
-			[gh60_dim[0] + outline, 0 - outline, rXY],
-			[gh60_dim[0] + outline, 20 - outline, rXY],
-			[0 - outline, 20 - outline, rXY],
-		])
-	);
-};
+function get_front_feet_border(padding) = [
+	[0 - padding, 0 - padding],
+	[gh60_dim[0] + padding, 0 - padding],
+	[gh60_dim[0] + padding, 20 - padding],
+	[0 - padding, 20 - padding],
+];
 
-module back_feet_border (outline, rXY = 0) {
-	polygon(
-		polyRound([
-			[0 - outline, gh60_dim[1] + outline, rXY],
-			[gh60_dim[0] + outline, gh60_dim[1] + outline, rXY],
-			[gh60_dim[0] + outline, gh60_dim[1] + outline - 20, rXY],
-			[0 - outline, gh60_dim[1] + outline - 20, rXY],
-		])
-	);
-};
+function get_back_feet_border(padding) = [
+	[0 - padding, gh60_dim[1] + padding],
+	[gh60_dim[0] + padding, gh60_dim[1] + padding],
+	[gh60_dim[0] + padding, gh60_dim[1] + padding - 20],
+	[0 - padding, gh60_dim[1] + padding - 20],
+];
 
-module front_feet_border_with_holes (padding, outline, rXY = M2_dk_r, feet_num = 4) {
+module front_feet_border (padding) {
+	polygon(get_front_feet_border(padding));
+}
+
+module back_feet_border (padding) {
+	polygon(get_back_feet_border(padding));
+}
+
+module front_feet_border_with_holes (padding, outline, feet_num = 4) {
 	difference () {
-		front_feet_border (outline);
+		front_feet_border(outline);
 
 		ha = holes_array(padding);
-		bp = (ha[2][0] - ha[0][0]) / feet_num;
+		bp = (ha[1][0] - ha[0][0]) / feet_num;
 		for (i = [ 1 : feet_num - 1 ] ) {
 			translate([ha[0][0] + bp * i, 0 - outline + 10])
-				circle(6);
-			translate([ha[2][0] + bp * i, 0 - outline + 10])
-				circle(6);
+				hole(6);
+			translate([ha[1][0] + bp * i, 0 - outline + 10])
+				hole(6);
 		}
 	}
 }
 
-module back_feet_border_with_holes (padding, outline, rXY = M2_dk_r, feet_num = 4) {
+module back_feet_border_with_holes (padding, outline, feet_num = 4) {
 	ha = holes_array(padding);
-	bp = (ha[5][0] - ha[3][0]) / feet_num;
+	bp = (ha[1][0] - ha[0][0]) / feet_num;
 
 	difference () {
 		back_feet_border (outline);
 
 		for (i = [ 1 : feet_num - 1 ] ) {
 			translate([ha[3][0] + bp * i, gh60_dim[1] + outline - 10])
-				circle(6);
-			translate([ha[5][0] + bp * i, gh60_dim[1] + outline - 10])
-				circle(6);
+				hole(6);
+			translate([ha[4][0] + bp * i, gh60_dim[1] + outline - 10])
+				hole(6);
 		}
 	}
 }
@@ -156,37 +156,49 @@ module feets (thickness, padding, rXY = M2_dk_r, rZ = 1.5) {
 
 	union () {
 		linear_extrude(thickness)
-			front_feet_border_with_holes(padding, outline, rXY);
+			front_feet_border_with_holes(padding, outline);
 
 		linear_extrude(thickness)
-			back_feet_border_with_holes(padding, outline, rXY);
+			back_feet_border_with_holes(padding, outline);
 	}
 }
 
 module feets_plate(thickness, padding, rXY = M2_dk_r, rZ = 1.5) {
 	outline =  padding + max(rXY, rZ);
-
-	union() {
-		extrudeWithRadius(thickness, rZ, rZ, 3) {
-		// linear_extrude(thickness) {
-			union () {
-				front_feet_border(outline, rXY);
-				back_feet_border(outline, rXY);
-			}
-		}
+	union () {
+		polyRoundExtrude(add_rXY(get_front_feet_border(outline), rXY), thickness, rZ, rZ, 3, 1);
+		polyRoundExtrude(add_rXY(get_back_feet_border(outline), rXY), thickness, rZ, rZ, 3, 1);
 	}
+	// union() {
+	// 	extrudeWithRadius(thickness, rZ, rZ, 3) {
+	// 	// linear_extrude(thickness) {
+	// 		union () {
+	// 			front_feet_border(outline, rXY);
+	// 			back_feet_border(outline, rXY);
+	// 		}
+	// 	}
+	// }
 }
+
+function add_rXY(l, rXY = 0) = [
+	[l[0][0], l[0][1], rXY],
+	[l[1][0], l[1][1], rXY],
+	[l[2][0], l[2][1], rXY],
+	[l[3][0], l[3][1], rXY],
+];
+
+function get_border(padding = 0) = [
+	[0 - padding, 0 - padding],
+	[gh60_dim[0] + padding, 0 - padding],
+	[gh60_dim[0] + padding, gh60_dim[1] + padding],
+	[0 - padding, gh60_dim[1] + padding]
+];
 
 module border (padding = 0, rXY = 0) {
 	polygon(
-		polyRound([
-			[0 - padding, 0 - padding, rXY],
-			[gh60_dim[0] + padding, 0 - padding, rXY],
-			[gh60_dim[0] + padding, gh60_dim[1] + padding, rXY],
-			[0 - padding, gh60_dim[1] + padding, rXY]
-		])
+		polyRound(add_rXY(get_border(padding), rXY))
 	);
-};
+}
 
 function getCenterX(list, c = 0, stop) = 
  c < len(list) - 1 && c < stop
@@ -332,11 +344,12 @@ module bottom_plate(thickness, padding, outline) {
 }
 
 module flat_plate(thickness=10, padding = 10, rXY = M2_dk_r, rZ = 1.5) {
-	union() {
-		extrudeWithRadius(thickness, rZ, rZ, 3)
-		// linear_extrude(thickness)
-		border(padding, rXY);
-	}
+	// union() {
+	// 	extrudeWithRadius(thickness, rZ, rZ, 3)
+	// 	// linear_extrude(thickness)
+	// 	border(padding, rXY);
+	// }
+	polyRoundExtrude(add_rXY(get_border(padding), rXY), thickness, rZ, rZ, 3, 1);
 }
 
 function get_plate_z(k, thickness, seperator) = - k * (thickness + seperator);
@@ -354,7 +367,6 @@ colors = [
 
 module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = M2_dk_r, rZ = 1.5, seperator = 10) {
 	plates = [7, 6, 5, 4, 4, 3, 2, 1, 0];
-	// plates = [7, 6, 5, 4, 4, 3, 1, 0];
 	outline =  padding + max(rXY, rZ);
 
 	for (k = [ 0 : len(plates) - 1 ] ) {
@@ -423,7 +435,7 @@ module structural_screws (thickness, padding, flip) {
 module structural_nuts (thickness, padding, d = M2_dk) {
 	for (i = holes_array(padding)) {
 		translate([i[0], i[1]]) {
-			circle(d = d);
+			hole(d / 2);
 		}
 	}
 }
