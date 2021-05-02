@@ -27,7 +27,7 @@ const {
   thickness = 3,
   padding = 10,
   rXY = 1.9,
-  rZ = 0,
+  rZ = thickness / 2,
 } = require("minimist")(process.argv.slice(2));
 
 if (filePath) {
@@ -48,7 +48,7 @@ if (filePath) {
   result += `layout = ${layout};` + "\n";
   result += `print_plates(layout`;
   [thickness, Math.max(padding, MIN_PADDING), rXY, rZ].map((v) => {
-    if (v) result += `,${v}`;
+    result += `,${v}`;
   });
   result += ");\n";
 

@@ -166,18 +166,9 @@ module feets (thickness, padding, rXY = M2_dk_r, rZ = 1.5) {
 module feets_plate(thickness, padding, rXY = M2_dk_r, rZ = 1.5) {
 	outline =  padding + max(rXY, rZ);
 	union () {
-		polyRoundExtrude(add_rXY(get_front_feet_border(outline), rXY), thickness, rZ, rZ, 3, 1);
-		polyRoundExtrude(add_rXY(get_back_feet_border(outline), rXY), thickness, rZ, rZ, 3, 1);
+		polyRoundExtrude(add_rXY(get_front_feet_border(outline), rXY), thickness, rZ, rZ, 3, 2);
+		polyRoundExtrude(add_rXY(get_back_feet_border(outline), rXY), thickness, rZ, rZ, 3, 2);
 	}
-	// union() {
-	// 	extrudeWithRadius(thickness, rZ, rZ, 3) {
-	// 	// linear_extrude(thickness) {
-	// 		union () {
-	// 			front_feet_border(outline, rXY);
-	// 			back_feet_border(outline, rXY);
-	// 		}
-	// 	}
-	// }
 }
 
 function add_rXY(l, rXY = 0) = [
@@ -344,12 +335,7 @@ module bottom_plate(thickness, padding, outline) {
 }
 
 module flat_plate(thickness=10, padding = 10, rXY = M2_dk_r, rZ = 1.5) {
-	// union() {
-	// 	extrudeWithRadius(thickness, rZ, rZ, 3)
-	// 	// linear_extrude(thickness)
-	// 	border(padding, rXY);
-	// }
-	polyRoundExtrude(add_rXY(get_border(padding), rXY), thickness, rZ, rZ, 3, 1);
+	polyRoundExtrude(add_rXY(get_border(padding), rXY), thickness, rZ, rZ, 3, 2);
 }
 
 function get_plate_z(k, thickness, seperator) = - k * (thickness + seperator);
