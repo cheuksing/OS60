@@ -24,10 +24,11 @@ const MIN_PADDING = 5;
 // const args = process.argv.splice(2);]
 const {
   _: [filePath],
-  thickness = 3,
-  padding = 10,
-  rXY = 1.9,
-  rZ = thickness / 2,
+  thickness,
+  padding,
+  rXY,
+  rZ,
+  easyReinforce,
 } = require("minimist")(process.argv.slice(2));
 
 if (filePath) {
@@ -47,8 +48,17 @@ if (filePath) {
   result += "include <../scad/case.scad>;" + "\n";
   result += `layout = ${layout};` + "\n";
   result += `print_plates(layout`;
-  [thickness, Math.max(padding, MIN_PADDING), rXY, rZ].map((v) => {
-    result += `,${v}`;
+
+  const tmp = {
+    thickness,
+    padding: Math.max(padding, MIN_PADDING),
+    rXY,
+    rZ,
+    easyReinforce,
+  };
+
+  Object.keys(tmp).map((k) => {
+    if (tmp[k]) result += `,${k}=${tmp[k]}`;
   });
   result += ");\n";
 

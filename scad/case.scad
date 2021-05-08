@@ -351,7 +351,7 @@ colors = [
 	"#eff0eb",
 ];
 
-module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = M2_dk_r, rZ = 1.5, seperator = 10) {
+module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = M2_dk_r, rZ = 1.5, seperator = 10, easyReinforce = false) {
 	plates = [7, 6, 5, 4, 4, 3, 2, 1, 0];
 	outline =  padding + max(rXY, rZ);
 
@@ -359,7 +359,14 @@ module print_plates(layout = default_layout, thickness = 3, padding = 10, rXY = 
 		p = plates[k];
 
 		translate([0, 0, get_plate_z(k, thickness, seperator)]) {
-			if (p <= 5) {
+
+			if (easyReinforce && p == 3) {
+				intersection() {
+					translate([0, 0, -0.01])
+						color(colors[p]) flat_plate(3 + 0.02, padding + 0.01, rXY, 0);
+						color(colors[p]) reinforce(layout, 3, padding, outline);
+				}
+			} else if (p <= 5) {
 				intersection() {
 					translate([0, 0, -0.01])
 						color(colors[p]) flat_plate(thickness + 0.02, outline + 0.01, rXY, rZ);
