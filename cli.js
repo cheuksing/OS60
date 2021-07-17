@@ -73,7 +73,7 @@ if (filePath) {
     params = {
       padding: Math.max(padding, MIN_PADDING),
       rXY,
-      curved_plates_offsets: `[${pOffset}]`
+      curved_plates_offsets: pOffset && `[${pOffset}]`
     };
   }
 
