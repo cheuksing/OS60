@@ -24,15 +24,21 @@ const MIN_PADDING = 5;
 // const args = process.argv.splice(2);]
 const {
   _: [filePath],
-  thickness,
+  // common
   padding,
   rXY,
+  // case
+  thickness,
   rZ,
   easyReinforce,
-} = require("minimist")(process.argv.slice(2));
+  // lasercut
+  pOffset
+} = require("minimist")(process.argv.slice(3));
 
 if (filePath) {
-  console.log(`Generating case based on ${filePath}`);
+  const type = process.argv[2]
+
+  console.log(`Generating ${type} files based on ${filePath}`);
 
   const fileName = path.basename(filePath, ".json");
   const kle = fs.readFileSync(filePath, "utf-8");
@@ -45,26 +51,55 @@ if (filePath) {
   }
 
   let result = "";
-  result += "include <../scad/case.scad>;" + "\n";
-  result += `layout = ${layout};` + "\n";
-  result += `print_plates(layout`;
+  let params = {}
 
-  const tmp = {
-    thickness,
-    padding: Math.max(padding, MIN_PADDING),
-    rXY,
-    rZ,
-    easyReinforce,
-  };
+  if (type === 'lasercut') {
+    result += "include <../scad/plates.scad>;" + "\n";
+    result += `layout = ${layout};` + "\n";
+    result += `laser_cut_plates(layout`;
 
-  Object.keys(tmp).map((k) => {
-    if (tmp[k]) result += `,${k}=${tmp[k]}`;
+    if (pOffset) {
+      let tmp = pOffset.split(',')
+      if (tmp.length !== 9 ) {
+        console.log('invalid pOffest length')
+        return
+      }
+      if (!tmp.every(x => x >= 0) ) {
+        console.log('invalid pOffest value')
+        return
+      }
+    }
+  
+    params = {
+      padding: Math.max(padding, MIN_PADDING),
+      rXY,
+      curved_plates_offsets: `[${pOffset}]`
+    };
+  }
+
+  if (type === 'case') {
+    result += "include <../scad/case.scad>;" + "\n";
+    result += `layout = ${layout};` + "\n";
+    result += `print_plates(layout`;
+  
+    params = {
+      thickness,
+      padding: Math.max(padding, MIN_PADDING),
+      rXY,
+      rZ,
+      easyReinforce,
+    };
+  }
+  
+
+  Object.keys(params).map((k) => {
+    if (params[k]) result += `,${k}=${params[k]}`;
   });
   result += ");\n";
 
-  fs.writeFile(`keyboards/${fileName}.scad`, result, function (err) {
+  fs.writeFile(`keyboards/${fileName}_${type}.scad`, result, function (err) {
     if (err) return console.log(`Error: Can not reslove ${filePath}.`);
-    console.log(`Done: Please check {repo_root}/keyboards/${fileName}.scad`);
+    console.log(`Done: Please check {repo_root}/keyboards/${fileName}_${type}.scad`);
   });
 } else {
   console.log("Missing required arguments: keyboard_layout_editor.json");

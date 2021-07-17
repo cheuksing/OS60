@@ -6,7 +6,8 @@
   "author": "tommy chan",
   "license": "MIT",
   "scripts": {
-    "case": "node cli.js"
+    "case": "node cli.js case",
+    "lasercut": "node cli.js lasercut"
   },
   "dependencies": {
     "minimist": "^1.2.5"
