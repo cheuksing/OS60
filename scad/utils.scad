@@ -69,7 +69,7 @@ module button_cutoff (width = 11, height = 12) {
 	]);
 }
 
-module usb_cutoff (padding) {
+module usb_cutoff (padding, innerPadding = 0) {
 	// a 12 x padding is cutted
 	width = 12;
 	// height = 15;
@@ -80,8 +80,8 @@ module usb_cutoff (padding) {
 	polygon([
 		[left, - padding],
 		[right, - padding],
-		[right, 0],
-		[left, 0]
+		[right, innerPadding],
+		[left, innerPadding]
 	]);
 }
 
@@ -212,7 +212,7 @@ module  cut_stabs (x, y, i, hole = stabs_hole) {
 	polygon(p[1]);
 }
 
-module cut_key (layout = default_layout, size = 14, simpleStab = false) {
+module cut_key (layout = default_layout, size = 14, isReinforce = false) {
 	for (r = [ 0 : len(layout) - 1 ] ) {
 		row = layout[r];
 		for (k = [ 0 : len(row) - 1 ] ) {
@@ -226,15 +226,30 @@ module cut_key (layout = default_layout, size = 14, simpleStab = false) {
 			translate([centerX, centerY, 0])
 				square(size, true);
 
+			large_holes = [stabs_hole[0] + 3, stabs_hole[1] + 2.5];
+
+			stabIndex = w >= 7 ? 3 : w >= 6.25 ? 2 : w >= 3 ? 1 : 0;
 			// stab rect 7 x 16
 			if (w >= 7) {
-				cut_stabs(centerX, centerY, 3, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 2.5] : stabs_hole);
+				cut_stabs(centerX, centerY, stabIndex, isReinforce ? large_holes : stabs_hole);
 			} else if (w >= 6.25) {
-				cut_stabs(centerX, centerY, 2, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 2.5] : stabs_hole);
+				cut_stabs(centerX, centerY, stabIndex, isReinforce ? large_holes : stabs_hole);
 			} else if (w >= 3) {
-				cut_stabs(centerX, centerY, 1, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 2.5] : stabs_hole);
+				cut_stabs(centerX, centerY, stabIndex, isReinforce ? large_holes : stabs_hole);
 			} else if (w >= 2) {
-				cut_stabs(centerX, centerY, 0, simpleStab ? [stabs_hole[0] + 3, stabs_hole[1] + 2.5] : stabs_hole);
+				cut_stabs(centerX, centerY, stabIndex, isReinforce ? large_holes : stabs_hole);
+			}
+
+			if (w >= 2 && isReinforce) {
+				s = _stabWidth(centerX, centerY, stabIndex, large_holes[0], large_holes[1]);
+
+				// extra space for stab wires
+				polygon([
+					[s[0], centerY - 16],
+					[s[1], centerY - 16],
+					[s[1], centerY],
+					[s[0], centerY],
+				]);
 			}
 		}
 	}

@@ -32,7 +32,8 @@ const {
   rZ,
   easyReinforce,
   // lasercut
-  pOffset
+  pOffset,
+  pRadius
 } = require("minimist")(process.argv.slice(3));
 
 if (filePath) {
@@ -73,7 +74,8 @@ if (filePath) {
     params = {
       padding: Math.max(padding, MIN_PADDING),
       rXY,
-      curved_plates_offsets: pOffset && `[${pOffset}]`
+      curved_plates_offsets: pOffset && `[${pOffset}]`,
+      pRadius
     };
   }
 

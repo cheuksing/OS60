@@ -1,10 +1,11 @@
 include <./utils.scad>;
 
-module plate_2d(layout = default_layout) {
+module plate_2d(layout = default_layout, pRadius = M2_d_r) {
 	difference() {
 		border(0);
-		screws_cutoff();
+		screws_cutoff(pRadius);
 		cut_key(layout);
+    button_cutoff();
 	}
 }
 
@@ -56,6 +57,8 @@ module bottom_plate_2d(padding, buffer = 0) {
   difference() {
     border(outline);
     structural_nuts(padding, M2_d);
+    button_cutoff();
+    usb_cutoff(outline, 12);
   }
 }
 
@@ -131,13 +134,14 @@ module print_plates_2d(
   padding = 10,
   rXY = M2_dk_r,
   curved_plates_offsets = default_curved_plates_offsets,
+  pRadius = M2_d_r,
   plate_type,
   zIndex,
 ) {
   round_everything(padding, curved_plates_offsets[zIndex], rXY, type > 5) {
     if (type == 0) topest_frame_2d(padding, curved_plates_offsets[zIndex]);
     else if (type == 1) top_frame_2d(padding, curved_plates_offsets[zIndex]);
-    else if (type == 2) plate_2d(layout, 1.5);
+    else if (type == 2) plate_2d(layout, pRadius);
     else if (type == 3) reinforce_2d(layout, padding, curved_plates_offsets[zIndex]);
     else if (type == 4) usb_frame_2d(padding, curved_plates_offsets[zIndex]);
     else if (type == 5) bottom_plate_2d(padding, curved_plates_offsets[zIndex]);
@@ -150,6 +154,7 @@ module preview_plates_2d(
   layout = default_layout,
   padding = 10,
   rXY = M2_dk_r,
+  pRadius = M2_d_r,
   seperator = 10,
   curved_plates_offsets = default_curved_plates_offsets
 ) {
@@ -165,6 +170,7 @@ module preview_plates_2d(
           padding = padding,
           rXY = rXY,
           curved_plates_offsets = curved_plates_offsets,
+          pRadius = pRadius,
           type = p,
           zIndex = k
         );
@@ -177,7 +183,8 @@ module laser_cut_plates(
   layout = default_layout,
   padding = 10,
   rXY = M2_dk_r,
-  curved_plates_offsets = default_curved_plates_offsets
+  curved_plates_offsets = default_curved_plates_offsets,
+  pRadius = M2_d_r,
 ) {
 	for (k = [ 0 : len(plates) - 1 ] ) {
 		p = plates[k];
@@ -188,6 +195,7 @@ module laser_cut_plates(
         padding = padding,
         rXY = rXY,
         curved_plates_offsets = curved_plates_offsets,
+        pRadius = pRadius,
         type = p,
         zIndex = k
       );
