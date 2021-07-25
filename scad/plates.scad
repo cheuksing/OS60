@@ -9,14 +9,14 @@ module plate_2d(layout = default_layout, pRadius = M2_d_r) {
 	}
 }
 
-module usb_frame_2d(padding, buffer = 0) {
+module usb_frame_2d(padding, buffer = 0, pRadius = gh60_holes_radius) {
   outline = padding + buffer;
 	difference() {
 		border(outline);
 		border(border_buffer);
 		usb_cutoff(outline);
 		structural_nuts(padding);
-    screws_cutoff(M2_d_r);
+    screws_cutoff(max(pRadius, gh60_holes_radius));
 	}
 }
 
@@ -136,7 +136,7 @@ module print_plates_2d(
   rXY = M2_dk_r,
   curved_plates_offsets = default_curved_plates_offsets,
   pRadius = M2_d_r,
-  plate_type,
+  type,
   zIndex,
 ) {
   round_everything(padding, curved_plates_offsets[zIndex], rXY, type > 5) {
@@ -144,7 +144,7 @@ module print_plates_2d(
     else if (type == 1) top_frame_2d(padding, curved_plates_offsets[zIndex]);
     else if (type == 2) plate_2d(layout, pRadius);
     else if (type == 3) reinforce_2d(layout, padding, curved_plates_offsets[zIndex]);
-    else if (type == 4) usb_frame_2d(padding, curved_plates_offsets[zIndex]);
+    else if (type == 4) usb_frame_2d(padding, curved_plates_offsets[zIndex], pRadius);
     else if (type == 5) bottom_plate_2d(padding, curved_plates_offsets[zIndex]);
     else if (type == 6) feets_extends_2d(padding);
     else if (type == 7) feets_2d(padding);
