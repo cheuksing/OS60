@@ -53,14 +53,17 @@ module.exports = function config(env, options) {
     module: {
       rules: [
         {
+          test: /\.html$/i,
+          loader: 'html-loader',
+        },
+        {
           test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
           loader: require.resolve('url-loader'),
         },
         {
           test: /\.(js|mjs|ts|tsx)$/,
-          include: path.resolve(__dirname),
+          include: path.resolve(__dirname, './src'),
           loader: 'babel-loader',
-          options: require('./babel.config'),
         },
         {
           test: /\.s[ac]ss$/i,
@@ -75,10 +78,20 @@ module.exports = function config(env, options) {
         },
       ],
     },
-    output: { filename: 'client-bundle.js' },
+    output: {
+      filename: 'client-bundle.js',
+      path: path.resolve(__dirname, './dist'),
+    },
     plugins: [
+      isDevServer &&
+        new webpack.DefinePlugin({
+          'process.env.NODE_ENV': JSON.stringify('development'),
+        }),
       isDevServer && new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin(),
+      new HtmlWebpackPlugin({
+        template: path.resolve(__dirname, './src/index.html'),
+      }),
+      // isEnvProduction &&
       new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/client-bundle/]),
     ].filter(Boolean),
   }
@@ -90,11 +103,9 @@ module.exports = function config(env, options) {
    * @type {import("webpack-dev-server").Configuration}
    */
   const devServer = {
-    contentBase: './public',
-    compress: true,
-    historyApiFallback: { disableDotRule: true },
     port: 3000,
     hot: true,
+    inline: true,
   }
 
   return isDevServer ? { ...appConfig, devServer } : [appConfig]
