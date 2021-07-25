@@ -16,6 +16,7 @@ module usb_frame_2d(padding, buffer = 0) {
 		border(border_buffer);
 		usb_cutoff(outline);
 		structural_nuts(padding);
+    screws_cutoff(M2_d_r);
 	}
 }
 
