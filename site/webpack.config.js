@@ -1,12 +1,10 @@
-/* SPDX-FileCopyrightText: 2014-present Kriasoft <hello@kriasoft.com> */
-/* SPDX-License-Identifier: MIT */
-
 const path = require('path')
 const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const TerserPlugin = require('terser-webpack-plugin')
 const InlineChunkHtmlPlugin = require('react-dev-utils/InlineChunkHtmlPlugin')
-// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+// const PrerenderSPAPlugin = require('prerender-spa-plugin')
+// const Renderer = PrerenderSPAPlugin.PuppeteerRenderer
 
 /**
  * Webpack configuration.
@@ -28,8 +26,10 @@ module.exports = function config(env, options) {
     mode: isEnvProduction ? 'production' : 'development',
     target: isDevServer ? 'web' : 'browserslist',
     bail: isEnvProduction,
-    entry: './src/index',
-    devtool: isEnvProduction ? 'source-map' : 'cheap-module-source-map',
+    entry: './src/client',
+    devtool: isDevServer ? 'inline-source-map' : undefined,
+    /* SPDX-FileCopyrightText: 2014-present Kriasoft <hello@kriasoft.com> */
+    /* SPDX-License-Identifier: MIT */
     optimization: {
       minimize: isEnvProduction,
       minimizer: [
@@ -80,19 +80,31 @@ module.exports = function config(env, options) {
     },
     output: {
       filename: 'client-bundle.js',
-      path: path.resolve(__dirname, './dist'),
+      path: path.resolve(__dirname, 'dist'),
+      publicPath: '/',
     },
     plugins: [
-      isDevServer &&
-        new webpack.DefinePlugin({
-          'process.env.NODE_ENV': JSON.stringify('development'),
-        }),
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(
+          isEnvProduction ? 'production' : 'development'
+        ),
+      }),
       isDevServer && new webpack.HotModuleReplacementPlugin(),
       new HtmlWebpackPlugin({
         template: path.resolve(__dirname, './src/index.html'),
       }),
+      // does not work in dev-server
+      isEnvProduction &&
+        new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/client-bundle/]),
       // isEnvProduction &&
-      new InlineChunkHtmlPlugin(HtmlWebpackPlugin, [/client-bundle/]),
+      //   new PrerenderSPAPlugin({
+      //     staticDir: path.join(__dirname, 'dist'),
+      //     routes: ['/'],
+      //     renderer: new Renderer({
+      //       headless: true,
+      //       renderAfterTime: 5000,
+      //     }),
+      //   }),
     ].filter(Boolean),
   }
 
@@ -106,6 +118,7 @@ module.exports = function config(env, options) {
     port: 3000,
     hot: true,
     inline: true,
+    contentBase: path.resolve(__dirname, 'dist'),
   }
 
   return isDevServer ? { ...appConfig, devServer } : [appConfig]

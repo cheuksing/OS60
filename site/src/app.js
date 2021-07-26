@@ -1,6 +1,6 @@
 import './index.scss'
 
-import { h, text, app } from 'hyperapp'
+import { h, text } from 'hyperapp'
 
 const AddTodo = (state) => ({
   ...state,
@@ -13,10 +13,10 @@ const NewValue = (state, event) => ({
   value: event.target.value,
 })
 
-app({
+export default {
   init: { todos: ['Learn Hyperapp'], value: '' },
   view: ({ todos, value }) =>
-    h('main', {}, [
+    h('main', { id: 'root' }, [
       h('h1', {}, text('To-do list ✏️')),
       h(
         'ul',
@@ -28,5 +28,4 @@ app({
         h('button', { onclick: AddTodo }, text('Add new')),
       ]),
     ]),
-  node: document.getElementById('app'),
-})
+}
