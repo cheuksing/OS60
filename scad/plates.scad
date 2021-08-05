@@ -1,6 +1,6 @@
 include <./utils.scad>;
 
-module plate_2d(layout = default_layout, pRadius = M2_d_r) {
+module plate_2d(layout = default_layout, pRadius = gh60_holes_radius) {
 	difference() {
 		border(0);
 		screws_cutoff(pRadius);
@@ -137,7 +137,7 @@ module print_plates_2d(
   padding = 10,
   rXY = M2_dk_r,
   curved_plates_offsets = default_curved_plates_offsets,
-  pRadius = M2_d_r,
+  pRadius = gh60_holes_radius,
   type,
   zIndex,
 ) {
@@ -157,7 +157,7 @@ module preview_plates_2d(
   layout = default_layout,
   padding = 10,
   rXY = M2_dk_r,
-  pRadius = M2_d_r,
+  pRadius = gh60_holes_radius,
   seperator = 10,
   curved_plates_offsets = default_curved_plates_offsets
 ) {
@@ -187,7 +187,7 @@ module laser_cut_plates(
   padding = 10,
   rXY = M2_dk_r,
   curved_plates_offsets = default_curved_plates_offsets,
-  pRadius = M2_d_r,
+  pRadius = gh60_holes_radius,
 ) {
 	for (k = [ 0 : len(plates) - 1 ] ) {
 		p = plates[k];
