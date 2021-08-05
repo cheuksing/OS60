@@ -59,7 +59,8 @@ module bottom_plate_2d(padding, buffer = 0) {
     border(outline);
     structural_nuts(padding, M2_d);
     button_cutoff();
-    usb_cutoff(outline, 12);
+    // usb_cutoff(outline, 12);
+    usb_cutoff(outline, 0);
   }
 }
 
@@ -124,7 +125,8 @@ module round_everything(padding = 10, buffer = 0, rXY = M2_dk_r, isFeet) {
 
 default_curved_plates_offsets = [
 // feet1,feet2,bottom,usb1,usb2,reinforce,0,top1,top2
-0,0,0,2,4,6,0,4,2
+// 0,0,0,2,4,6,0,4,2
+0,0,0,2,4,4,0,4,2
 // 0,0,0,0,0,0,0,0,0
 ];
 
