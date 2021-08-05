@@ -20,13 +20,13 @@ function holes_array(padding) = [
 	// left-top
 	[0 - holes_offset(padding), 0 - holes_offset(padding)],
 	// middle-top
-	[(gh60_dim[0] + holes_offset(padding) * 2) / 2, 0 - holes_offset(padding)],
+	[(gh60_dim[0] + holes_offset(padding)) / 2 - holes_offset(padding), 0 - holes_offset(padding)],
 	// right-top
 	[gh60_dim[0] + holes_offset(padding), 0 - holes_offset(padding)],
 	// left-bottom
 	[0 - holes_offset(padding), gh60_dim[1] + holes_offset(padding)],
 	// middle-bottom
-	[(gh60_dim[0] + holes_offset(padding) * 2) / 2, gh60_dim[1] + holes_offset(padding)],
+	[(gh60_dim[0] + holes_offset(padding) * 2) / 2  - holes_offset(padding), gh60_dim[1] + holes_offset(padding)],
 	// right-bottom
 	[gh60_dim[0] + holes_offset(padding), gh60_dim[1] + holes_offset(padding)],
 ];
